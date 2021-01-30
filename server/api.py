@@ -1,8 +1,13 @@
 import requests
 
-#TODO: implement with the deezer API
-def search_songs(query):
-    pass
+API_URL = 'https://api.deezer.com'
+
+def get_search_results(query):
+    response = requests.get(f'{API_URL}/search?output=json&limit=10&q={query}')
+    json = response.json()
+    return json['data']
+
 
 def get_song(song_id):
-    pass
+    response = requests.get(f'{API_URL}/track/{song_id}')
+    return response.json()
