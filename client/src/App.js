@@ -59,7 +59,7 @@ class App extends Component {
                     onSongSkip={() => songs.length > 1 &&
                         this.emitData('play-song', songs[1].id)} />
 
-                <Queue songs={songs}
+                <Queue songs={songs.slice(1)}
                     onPlaySong={(atIndex) => this.emitData('play-song', atIndex)}
                     onMoveSong={(fromIndex, toIndex) =>
                         this.emitData('move-song', fromIndex, toIndex)}

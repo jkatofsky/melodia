@@ -33,7 +33,7 @@ def search_songs(query):
 # get the preview file from the API?
 # how does this fit into the way I'm deciding currently playing song by the 0-th index?
 
-#TODO !!!!!! WHY IS STATE-UPDATE NOT EMITTING PROPERLY EXCEPT FOR ON THE JOIN
+#TODO off-by-one error with deleting songs: clicking on i-th song deletes i-1-th
 
 get_song_list = lambda queue : [song.api_data for song in queue.songs]
 
@@ -95,7 +95,7 @@ def queue_song(room_id, song_id):
 @socketio.on('remove-song')
 def remove_song(room_id, at_index):
     queue: Queue = Queue.objects.get_or_404(pk=room_id)
-    song = queue.songs.pop(at_index)
+    song = queue.songs.pop(at_index + 1)
     song.delete()
     queue.save()
 
