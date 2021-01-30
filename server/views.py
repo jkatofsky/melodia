@@ -1,5 +1,9 @@
 from .app import app, socketio
-from flask import render_template
+from .models import *
+from .api import *
+
+from flask import render_template, request
+from flask_socketio import join_room, leave_room, emit
 
 @app.route('/')
 def homepage():
@@ -11,49 +15,70 @@ def room(room_id):
 
 #TODO: implement all of the routes below
 # https://flask-socketio.readthedocs.io/en/latest/
-# use rooms! https://flask-socketio.readthedocs.io/en/latest/#rooms (join for get-songs)
 
 @app.route('/create-room')
 def create_room():
-    #creates relevant objects and returns room ID
-    pass
+    room = Room()
+    return {'room_id': str(room.id)}
 
-@app.route('/suggest/<query>')
-def suggest_songs(query):
-    #calls the song api and returns song suggestions
+@app.route('/search/<query>')
+def search_songs(query):
+    search_results = search_songs(query)
+    #TODO: return the relevant info for results
     pass
 
 #TODO: delete the room when no one's in it
-#TODO: need to figure out how to synchronize the song streaming:
-# - the timing of auto-changing songs when a song finishes playing
-# - getting the correct time in the song on join
 
-@socketio.on('get-songs')
-def get_songs(room_id):
-    #gets the current songs for id and returns them
-    pass
+#TODO: need to figure out how to stream song!!!
+# https://stackoverflow.com/questions/23396575/node-socket-live-audio-stream-broadcast/26029102#26029102 but for flask
+# get the preview file from the API?
+# how does this fit into the way I'm deciding currently playing song by the 0-th index?
+
+def broadcast_state(room_id):
+    data = {}
+    #TODO: JSONify all of the relevant state
+    emit('state-update', data, to=room_id, json=True)
+
+
+@socketio.on('join')
+def on_join(room_id):
+    join_room(room_id)
+    broadcast_state(request.sid) #to only get information for joining user on join
+
+
+@socketio.on('leave')
+def on_leave(room_id):
+    leave_room(room_id)
+
 
 @socketio.on('toggle-pause')
 def toggle_pause(room_id):
-    #plays/pauses song for all clients
-    pass
+    room: Room = Room.objects.get_or_404(id=room_id)
+    room.is_playing = not room.is_playing
+    room.save()
 
-@socketio.on('add-song')
-def add_song(room_id, song_id, index):
-    #update and return queue to all clients with song-id added at index
-    pass
+    broadcast_state(room_id)
+
 
 @socketio.on('play-song')
-def play_song(room_id, song_id):
-    #update and return queue to all clients with song-id playing
-    pass
+def play_song(room_id, at_index):
+    #TODO: update queue with song-id playing
+    broadcast_state(room_id)
+
+
+@socketio.on('queue-song')
+def queue_song(room_id, song_id):
+    #TODO: update queue with song-id added at index
+    broadcast_state(room_id)
+
 
 @socketio.on('remove-song')
-def remove_song(room_id, song_id):
-    #update and return queue to all clients with song-id removed
-    pass
+def remove_song(room_id, at_index):
+    #TODO: update queue with song at index removed
+    broadcast_state(room_id)
+
 
 @socketio.on('move-song')
-def move_song(room_id, song_id, to_index):
-    #update and return queue to all clients with song-id moved to_index
-    pass
+def move_song(room_id, from_index, to_index):
+    #TODO: update queue with song-id moved to_index
+    broadcast_state(room_id)
