@@ -24,9 +24,11 @@ def suggest_songs(query):
     pass
 
 #TODO: delete the room when no one's in it
-#TODO: need to figure out how the timing of auto-changing songs works when a song finishes playing
+#TODO: need to figure out how to synchronize the song streaming:
+# - the timing of auto-changing songs when a song finishes playing
+# - getting the correct time in the song on join
 
-@socketio.socketio('get-songs')
+@socketio.on('get-songs')
 def get_songs(room_id):
     #gets the current songs for id and returns them
     pass
