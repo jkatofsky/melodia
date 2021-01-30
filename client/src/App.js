@@ -16,6 +16,7 @@ class App extends Component {
 
         this.state = {
             socket: null,
+            validRoom: true,
             songs: [],
             isPlaying: false,
         }
@@ -24,16 +25,23 @@ class App extends Component {
     componentDidMount() {
         const socket = io(SERVER_URL);
         socket.on('connect', () => {
-            socket.emit('join', this.roomID)
+            socket.emit('join', this.roomID);
         });
         socket.on("state-update", data => {
-            this.setState({ songs: data.songs })
+            if (!data) {
+                this.setState({ validRoom: false });
+                socket.disconnect();
+                return;
+            }
+            this.setState({ ...data })
         });
         this.setState({ socket });
     }
 
     componentWillUnmount() {
-        // TODO: get rid of connection
+        const { socket } = this.state;
+        socket.emit('leave');
+        socket.disconnect();
     }
 
     emitData = (endpoint, ...args) => {
@@ -43,28 +51,30 @@ class App extends Component {
 
     render() {
 
-        const { socket, songs, isPlaying } = this.state;
+        const { socket, validRoom, songs, isPlaying } = this.state;
 
         return !socket ?
-            // TODO: implement loading
+            // TODO: implement loading and invalid room states
             <></>
             :
-            // TODO: implement all of the below components
-            <>
-                <Search onQueueSong={(songID) => this.emitData('queue-song', songID)} />
+            !validRoom ?
+                <></>
+                // TODO: implement all of the below components
+                : <>
+                    <Search onQueueSong={(songID) => this.emitData('queue-song', songID)} />
 
-                <Player song={songs.length > 0 ? songs[0] : null}
-                    isPlaying={isPlaying}
-                    onTogglePause={() => this.emitData('toggle-pause')}
-                    onSongSkip={() => songs.length > 1 &&
-                        this.emitData('play-song', songs[1].id)} />
+                    <Player song={songs.length > 0 ? songs[0] : null}
+                        isPlaying={isPlaying}
+                        onTogglePause={() => this.emitData('toggle-pause')}
+                        onSongSkip={() => songs.length > 1 &&
+                            this.emitData('play-song', songs[1].id)} />
 
-                <Queue songs={songs.slice(1)}
-                    onPlaySong={(atIndex) => this.emitData('play-song', atIndex)}
-                    onMoveSong={(fromIndex, toIndex) =>
-                        this.emitData('move-song', fromIndex, toIndex)}
-                    onRemoveSong={(atIndex) => this.emitData('remove-song', atIndex)} />
-            </>;
+                    <Queue songs={songs.slice(1)}
+                        onPlaySong={(atIndex) => this.emitData('play-song', atIndex)}
+                        onMoveSong={(fromIndex, toIndex) =>
+                            this.emitData('move-song', fromIndex, toIndex)}
+                        onRemoveSong={(atIndex) => this.emitData('remove-song', atIndex)} />
+                </>;
     }
 }
 

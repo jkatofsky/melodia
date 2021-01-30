@@ -2,6 +2,7 @@ from .app import app, socketio
 from .models import *
 from .api import *
 
+import bson
 from flask import render_template, request, jsonify
 from flask_socketio import join_room, leave_room, emit
 
@@ -40,13 +41,18 @@ get_song_list = lambda queue : [song.api_data for song in queue.songs]
 
 @socketio.on('join')
 def on_join(room_id):
+    if not bson.objectid.ObjectId.is_valid(room_id):
+        emit('state-update', False, room=request.sid)
+        return
+    
     join_room(room_id)
+
     queue: Queue = Queue.objects.get_or_404(pk=room_id)
 
     emit('state-update', 
             {'isPlaying': queue.is_playing,
             'songs': get_song_list(queue)},
-            room=request.sid, include_self=True)
+            room=request.sid)
 
 
 @socketio.on('leave')
