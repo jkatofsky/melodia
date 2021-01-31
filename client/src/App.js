@@ -33,10 +33,12 @@ class App extends Component {
         });
         socket.on("update-songs", songs => {
             if (!songs) {
+                console.log('test');
                 this.setState({ validRoom: false });
                 socket.disconnect();
                 return;
             }
+            console.log('foo', songs)
             this.setState({ songs })
         });
         this.setState({ socket });
@@ -75,7 +77,8 @@ class App extends Component {
 
                             <Col lg={4}>
                                 <div className='section'>
-                                    <Player songs={songs}
+                                    <Player song={songs.length > 0 ? songs[0] : null}
+                                        emptyQueue={songs.length <= 1}
                                         onSongSkip={() => songs.length > 1 ?
                                             this.emitData('play-song', 1) :
                                             this.emitData('remove-song', 0)} />
