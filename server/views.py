@@ -11,7 +11,7 @@ def homepage():
     return render_template('index.html')
 
 
-@app.route('/<room_id>')
+@app.route('/room/<room_id>')
 def room(room_id):
     return app.send_static_file('index.html')
 

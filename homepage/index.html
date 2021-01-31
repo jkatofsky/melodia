@@ -5,21 +5,112 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Melodia</title>
-        <link rel="stylesheet" type="text/css" href="style.css">
+        <style>
+            h1 {
+                font-size: 6em;
+                margin: 0;
+                padding: 0;
+                text-align: center;
+                font-family: 'Pacifico', cursive;
+                position: absolute;
+                top: 20%;
+                left: 50%;
+                transform: translateX(-50%) translateY(-50%);
+            }
+
+            body {
+                height: 100vh;
+                background: linear-gradient(rgb(183, 63, 238), rgb(240, 168, 236));
+            }
+
+            .btn1 {
+                width: 340px;
+                height: 85px;
+                background-color: rgb(150, 238, 238);
+                border-radius: 80px;
+                border: 0px solid rgb(150, 238, 238);
+                position: absolute;
+                /* right: 39%;
+                top: 42%; */
+                top: 40%;
+                left: 50%;
+                transform: translateX(-50%) translateY(-50%);
+                font-size: 2.2em;
+                font-family: 'Quicksand', sans-serif;
+
+            }
+
+            .btn2 {
+                width: 340px;
+                height: 85px;
+                background-color: rgb(150, 238, 238);
+                border-radius: 80px;
+                border: 0px solid rgb(150, 238, 238);
+                position: absolute;
+                /* right: 39%;
+                top: 57%; */
+                top: 55%;
+                left: 50%;
+                transform: translateX(-50%) translateY(-50%);
+                font-size: 2.2em;
+                font-family: 'Quicksand', sans-serif;
+            }
+
+            .txtbox {
+                width: 250px;
+                height: 48px;
+                background-color: rgb(255, 255, 255);
+                border-radius: 20px;
+                border: 6px solid rgb(208, 216, 213);
+                position: absolute;
+                top: 66%;
+                left: 50%;
+                transform: translateX(-50%) translateY(-50%);
+                font-size: 1em;
+                font-family: 'Quicksand', sans-serif;
+            }
+        </style>
+        <link href="https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop&family=Pacifico&display=swap"
+            rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet">
+
+        <!-- TODO: get this figured out -->
+        <link rel="shortcut icon" type="image/png" href="favicon.png">
     </head>
 
-    <!--
-        "create room" button, which uses fetch() to call the /create-room endpoint of the API
-        (fetch reference: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
-        when the fetch returns with a room_id, redirect to the base URL with "/{room_id}" appended to it
-    -->
-
-    <!--
-        "join room" button next to a text input field
-        when clicked, redirect to the base URL with "/{text_field_contents}" appended to it
-    -->
-
     <body>
+
+
+        <h1>Melodia</h1>
+        <button id="create" class="btn1">Create Room</button>
+        <br>
+        <input type="text" id="room_id" placeholder="Enter Room ID" class="txtbox">
+        <button id="join" class="btn2">Join Room</button>
+
+        <script>
+            let SERVER_URL;
+            if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+                SERVER_URL = "http://localhost:5000";
+            } else {
+                SERVER_URL = "https://mchacks-melodia.appspot.com";
+            }
+
+            document.getElementById('create').addEventListener('click', createRoom);
+
+            function createRoom() {
+                fetch(`${SERVER_URL}/api/create-room`)
+                    .then(res => res.json())
+                    .then(res => window.location.href = `/${res.room_id}`);
+            }
+
+            document.getElementById('join').addEventListener('click', joinRoom);
+
+            function joinRoom() {
+                var roomID = document.getElementById("room_id").value;
+                window.location.href = `/room/${roomID}`
+            }
+        </script>
+
     </body>
 
 </html>

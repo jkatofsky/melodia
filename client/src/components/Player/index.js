@@ -14,9 +14,10 @@ class Player extends Component {
                     <p className='notice'>No song playing</p>
                     : <>
                         <button className='button skip-button' onClick={onSongSkip}>
-                            {!songs.length > 1 ?
-                                <MdSkipNext className='icon' />
-                                : <MdDelete className='icon' />}
+                            {songs.length > 1 ?
+                                <MdSkipNext className='icon' size={20} />
+                                : <MdDelete className='icon' size={20} />
+                            }
                         </button>
                         <h2><i>{songs[0].title}</i></h2>
                         <h4>{songs[0].artist.name}&nbsp;&mdash;&nbsp;{songs[0].album.title}</h4>

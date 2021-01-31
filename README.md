@@ -15,9 +15,9 @@ Built with:
 
 ## TODO
 
-- [ ] all Devpost stuff
-- [ ] adding Adam's homepage and integrating it
-- [ ] all aesthetic stuff for the room code
-- [ ] figuring out what we're doing à la syncing song playback
-- [ ] figure out the 400 errors for 
+- [ ] make devpost description more mental-health-y
+- [ ] add screenshots to devpost
+- [ ] fix music playback
+- [ ] 'copy link/id to clip board' button on room
+- [ ] 'go to homepage' button on room
 - [ ] all TODOs in the code itself
