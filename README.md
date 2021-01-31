@@ -17,11 +17,8 @@ Built with:
 
 - [ ] fix the prod 400 bug!!! (only first action after refresh works)
 - [ ] make devpost description more mental-health-y
-- [ ] add favicons, meta tags to both homepage and react app
+- [ ] add favicons to homepage
 - [ ] all TODOs in the code itself
 - [ ] fix homepage button spacing
 - [ ] 'copy link/id to clip board' button on room
 - [ ] 'go to homepage' button on room
-
-- specify port number explicitly with link
-- 
