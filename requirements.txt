@@ -3,5 +3,6 @@ flask-cors
 flask-socketio
 flask-mongoengine
 gevent
+gevent-websocket
 gunicorn
 requests

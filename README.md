@@ -22,3 +22,6 @@ Built with:
 - [ ] fix homepage button spacing
 - [ ] 'copy link/id to clip board' button on room
 - [ ] 'go to homepage' button on room
+
+- specify port number explicitly with link
+- 
