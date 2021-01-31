@@ -1,6 +1,5 @@
 from .app import app, socketio
-from .models import *
-from .api import *
+from .models import get_search_results, get_song, Queue
 
 import bson
 from flask import render_template, request, jsonify
@@ -34,10 +33,6 @@ def search_songs(query):
 # get the preview file from the API?
 # how does this fit into the way I'm deciding currently playing song by the 0-th index?
 
-#TODO off-by-one error with deleting songs: clicking on i-th song deletes i-1-th
-
-get_song_list = lambda queue : [song.api_data for song in queue.songs]
-
 
 @socketio.on('join')
 def on_join(room_id):
@@ -50,8 +45,7 @@ def on_join(room_id):
     queue: Queue = Queue.objects.get_or_404(pk=room_id)
 
     emit('state-update', 
-            {'isPlaying': queue.is_playing,
-            'songs': get_song_list(queue)},
+            {'isPlaying': queue.is_playing, 'songs': queue.songs},
             room=request.sid)
 
 
@@ -78,7 +72,7 @@ def play_song(room_id, at_index):
     queue.save()
 
     emit('state-update', 
-        {'songs': get_song_list(queue)},
+        {'songs': queue.songs},
         room=room_id, include_self=True)
 
 
@@ -87,26 +81,23 @@ def queue_song(room_id, song_id):
     queue: Queue = Queue.objects.get_or_404(pk=room_id)
 
     song_data = get_song(song_id)
-    song: Song = Song.objects.create(api_data=song_data)
-    song.save()
 
-    queue.songs.append(song)
+    queue.songs.append(song_data)
     queue.save()
 
     emit('state-update', 
-        {'songs': get_song_list(queue)},
+        {'songs': queue.songs},
         to=room_id, include_self=True)
 
 
 @socketio.on('remove-song')
 def remove_song(room_id, at_index):
     queue: Queue = Queue.objects.get_or_404(pk=room_id)
-    song = queue.songs.pop(at_index + 1)
-    song.delete()
+    queue.songs.pop(at_index + 1)
     queue.save()
 
     emit('state-update', 
-        {'songs': get_song_list(queue)},
+        {'songs': queue.songs},
         room=room_id, include_self=True)
 
 
@@ -117,5 +108,5 @@ def move_song(room_id, from_index, to_index):
     queue.save()
 
     emit('state-update', 
-        {'songs': get_song_list(queue)},
+        {'songs': queue.songs},
         room=room_id, include_self=True)

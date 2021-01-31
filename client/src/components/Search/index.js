@@ -21,10 +21,17 @@ class Search extends Component {
                 mode: 'cors',
                 headers: { 'Access-Control-Allow-Origin': '*' }
             });
-        const responseJSON = await response.json();
+
+        let songs;
+        if (response.status !== 200) {
+            songs = [];
+        } else {
+            const responseJSON = await response.json();
+            songs = responseJSON['results'];
+        }
         this.setState({
-            songs: responseJSON['results'],
-            loading: false
+            loading: false,
+            songs
         });
     }
 

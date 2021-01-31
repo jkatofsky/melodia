@@ -1,1 +1,6 @@
-TODO: upload everything, but for the client, ONLY upload build folder
+client/*
+!client/build/
+LICENSE
+README.md
+deploy.sh
+.gitignore

@@ -1,12 +1,20 @@
-from flask_mongoengine import MongoEngine
+from .app import db
+import requests
+
+API_URL = 'https://api.deezer.com'
 
 
-db = MongoEngine()
+def get_search_results(query):
+    response = requests.get(f'{API_URL}/search?output=json&limit=10&q={query}')
+    json = response.json()
+    return json['data']
 
 
-class Song(db.Document):
-    api_data = db.DictField() #TODO: save only the fields that I want instead?
+def get_song(song_id):
+    response = requests.get(f'{API_URL}/track/{song_id}')
+    return response.json()
+
 
 class Queue(db.Document):
     is_playing = db.BooleanField(default=False)
-    songs = db.ListField(db.ReferenceField(Song), default=list)
+    songs = db.ListField(db.DictField(), default=list)

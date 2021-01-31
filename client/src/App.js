@@ -23,7 +23,7 @@ class App extends Component {
     }
 
     componentDidMount() {
-        const socket = io(SERVER_URL);
+        const socket = io(SERVER_URL, { transport: ['websocket'] });
         socket.on('connect', () => {
             socket.emit('join', this.roomID);
         });
