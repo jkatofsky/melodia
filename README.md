@@ -15,9 +15,11 @@ Built with:
 
 ## TODO
 
+- [ ] fix music playback grey-out bug
 - [ ] make devpost description more mental-health-y
+- [ ] add favicons, meta tags to both homepage and react app
+- [ ] fix homepage button spacing
 - [ ] add screenshots to devpost
-- [ ] fix music playback
+- [ ] all TODOs in the code itself
 - [ ] 'copy link/id to clip board' button on room
 - [ ] 'go to homepage' button on room
-- [ ] all TODOs in the code itself
