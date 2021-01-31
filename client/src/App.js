@@ -33,12 +33,10 @@ class App extends Component {
         });
         socket.on("update-songs", songs => {
             if (!songs) {
-                console.log('test');
                 this.setState({ validRoom: false });
                 socket.disconnect();
                 return;
             }
-            console.log('foo', songs)
             this.setState({ songs })
         });
         this.setState({ socket });
@@ -62,10 +60,10 @@ class App extends Component {
         return <>
             <Header />
             {!socket ?
-                <p className='notice'>Loading room...</p>
+                <h3>Loading room...</h3>
                 :
                 !validRoom ?
-                    <p className='notice'>Invalid room link!</p>
+                    <h3>Invalid room link!</h3>
                     : <Container>
                         <Row>
 

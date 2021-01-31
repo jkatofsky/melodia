@@ -32,7 +32,7 @@ def search_songs(query):
 @socketio.on('join')
 def on_join(room_id):
     if not bson.objectid.ObjectId.is_valid(room_id):
-        emit('state-update', False, room=request.sid)
+        emit('update-songs', False, room=request.sid)
         return
     
     join_room(room_id)
