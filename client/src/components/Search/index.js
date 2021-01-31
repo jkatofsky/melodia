@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import { SERVER_URL } from '../../util/api.js';
 import PropTypes from 'prop-types';
+import { MdQueueMusic } from 'react-icons/md';
+
+import SongCard from '../SongCard';
+import './style.css';
 
 class Search extends Component {
 
@@ -51,20 +55,23 @@ class Search extends Component {
         const { onQueueSong } = this.props;
         const { loading, songs } = this.state;
 
+
         return <>
-            <h4>Search</h4>
+            <h2><u>Search</u></h2>
             <input placeholder='Search songs'
                 type="text" onChange={this.handleQueryChange} />
 
-            {!loading ?
-                songs.map(song => (
-                    <div key={song.id} onClick={() => {
-                        onQueueSong(song.id)
-                    }}>
-                        {song.title}
-                    </div>
-                ))
-                : <>{/* TODO: render loading state */}</>}
+            <div className='songs-wrapper'>
+                {!loading ?
+                    songs.map(song => (
+                        <SongCard key={song.id} song={song} buttons={
+                            <button onClick={() => onQueueSong(song.id)} className='button'>
+                                <MdQueueMusic className='icon' size={30} />
+                            </button>
+                        } />
+                    ))
+                    : <p className='notice'>Loading...</p>}
+            </div>
         </>
     }
 }

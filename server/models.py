@@ -16,5 +16,4 @@ def get_song(song_id):
 
 
 class Queue(db.Document):
-    is_playing = db.BooleanField(default=False)
     songs = db.ListField(db.DictField(), default=list)

@@ -2,6 +2,6 @@ flask
 flask-cors
 flask-socketio
 flask-mongoengine
-eventlet
+gevent
 gunicorn
 requests

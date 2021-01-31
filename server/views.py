@@ -26,14 +26,9 @@ def create_room():
 def search_songs(query):
     return jsonify({'results': get_search_results(query)})
 
+
 #TODO: delete the room when no one's in it
-
-#TODO: need to figure out how to stream song!!!
-# https://stackoverflow.com/questions/23396575/node-socket-live-audio-stream-broadcast/26029102#26029102 but for flask
-# get the preview file from the API?
-# how does this fit into the way I'm deciding currently playing song by the 0-th index?
-
-
+ 
 @socketio.on('join')
 def on_join(room_id):
     if not bson.objectid.ObjectId.is_valid(room_id):
@@ -44,25 +39,13 @@ def on_join(room_id):
 
     queue: Queue = Queue.objects.get_or_404(pk=room_id)
 
-    emit('state-update', 
-            {'isPlaying': queue.is_playing, 'songs': queue.songs},
-            room=request.sid)
+    emit('update-songs', queue.songs, room=request.sid)
+
 
 
 @socketio.on('leave')
 def on_leave(room_id):
     leave_room(room_id)
-
-
-@socketio.on('toggle-pause')
-def toggle_pause(room_id):
-    queue: Queue = Queue.objects.get_or_404(pk=room_id)
-    queue.is_playing = not queue.is_playing
-    queue.save()
-
-    emit('state-update', 
-        {'isPlaying': queue.is_playing},
-        room=room_id, include_self=True)
 
 
 @socketio.on('play-song')
@@ -71,9 +54,7 @@ def play_song(room_id, at_index):
     queue.songs = queue.songs[at_index:]
     queue.save()
 
-    emit('state-update', 
-        {'songs': queue.songs},
-        room=room_id, include_self=True)
+    emit('update-songs', queue.songs, room=room_id, include_self=True)
 
 
 @socketio.on('queue-song')
@@ -85,28 +66,14 @@ def queue_song(room_id, song_id):
     queue.songs.append(song_data)
     queue.save()
 
-    emit('state-update', 
-        {'songs': queue.songs},
-        to=room_id, include_self=True)
+    emit('update-songs', queue.songs, room=room_id, include_self=True)
 
 
 @socketio.on('remove-song')
 def remove_song(room_id, at_index):
     queue: Queue = Queue.objects.get_or_404(pk=room_id)
-    queue.songs.pop(at_index + 1)
+    queue.songs.pop(at_index)
     queue.save()
 
-    emit('state-update', 
-        {'songs': queue.songs},
-        room=room_id, include_self=True)
+    emit('update-songs', queue.songs, room=room_id, include_self=True)
 
-
-@socketio.on('move-song')
-def move_song(room_id, from_index, to_index):
-    queue: Queue = Queue.objects.get_or_404(pk=room_id)
-    queue.songs.insert(to_index, queue.songs.pop(from_index))
-    queue.save()
-
-    emit('state-update', 
-        {'songs': queue.songs},
-        room=room_id, include_self=True)

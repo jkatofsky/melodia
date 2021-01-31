@@ -1,11 +1,16 @@
 import React, { Component } from 'react';
 import { io } from "socket.io-client";
+import { Container, Row, Col } from 'react-grid-system';
 
 import './App.css';
 import Search from './components/Search'
 import Player from './components/Player';
-import Queue from './components/Queue'
+import Queue from './components/Queue';
+import Header from './components/Header';
 import { SERVER_URL } from './util/api.js';
+
+// TODO: revisit whether or not I should have an explicit loading flag
+// TODO: revisit how to render loading state
 
 class App extends Component {
     constructor(props) {
@@ -17,8 +22,7 @@ class App extends Component {
         this.state = {
             socket: null,
             validRoom: true,
-            songs: [],
-            isPlaying: false,
+            songs: []
         }
     }
 
@@ -27,20 +31,20 @@ class App extends Component {
         socket.on('connect', () => {
             socket.emit('join', this.roomID);
         });
-        socket.on("state-update", data => {
-            if (!data) {
+        socket.on("update-songs", songs => {
+            if (!songs) {
                 this.setState({ validRoom: false });
                 socket.disconnect();
                 return;
             }
-            this.setState({ ...data })
+            this.setState({ songs })
         });
         this.setState({ socket });
     }
 
     componentWillUnmount() {
         const { socket } = this.state;
-        socket.emit('leave');
+        socket.emit('leave', this.roomID);
         socket.disconnect();
     }
 
@@ -51,30 +55,47 @@ class App extends Component {
 
     render() {
 
-        const { socket, validRoom, songs, isPlaying } = this.state;
+        const { socket, validRoom, songs } = this.state;
 
-        return !socket ?
-            // TODO: implement loading and invalid room states
-            <></>
-            :
-            !validRoom ?
-                <></>
-                // TODO: implement all of the below components
-                : <>
-                    <Search onQueueSong={(songID) => this.emitData('queue-song', songID)} />
+        return <>
+            <Header />
+            {!socket ?
+                <p className='notice'>Loading room...</p>
+                :
+                !validRoom ?
+                    <p className='notice'>Invalid room link!</p>
+                    : <Container>
+                        <Row>
 
-                    <Player song={songs.length > 0 ? songs[0] : null}
-                        isPlaying={isPlaying}
-                        onTogglePause={() => this.emitData('toggle-pause')}
-                        onSongSkip={() => songs.length > 1 &&
-                            this.emitData('play-song', songs[1].id)} />
+                            <Col lg={4}>
+                                <div className='section'>
+                                    <Search onQueueSong={(songID) => this.emitData('queue-song', songID)} />
+                                </div>
+                            </Col>
 
-                    <Queue songs={songs.slice(1)}
-                        onPlaySong={(atIndex) => this.emitData('play-song', atIndex)}
-                        onMoveSong={(fromIndex, toIndex) =>
-                            this.emitData('move-song', fromIndex, toIndex)}
-                        onRemoveSong={(atIndex) => this.emitData('remove-song', atIndex)} />
-                </>;
+                            <Col lg={4}>
+                                <div className='section'>
+                                    <Player songs={songs}
+                                        onSongSkip={() => songs.length > 1 ?
+                                            this.emitData('play-song', 1) :
+                                            this.emitData('remove-song', 0)} />
+                                </div>
+                            </Col>
+
+                            <Col lg={4}>
+                                <div className='section'>
+                                    <Queue songs={songs.slice(1)}
+                                        onPlaySong={(atIndex) =>
+                                            this.emitData('play-song', atIndex + 1)}
+                                        onRemoveSong={(atIndex) =>
+                                            this.emitData('remove-song', atIndex + 1)} />
+                                </div>
+                            </Col>
+
+                        </Row>
+                    </Container>
+            }
+        </>;
     }
 }
 

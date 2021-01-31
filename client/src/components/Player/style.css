@@ -1,0 +1,19 @@
+.song-player-info {
+    text-align: center;
+}
+
+.song-player-info img {
+    max-width: 90%;
+    max-height: 300px;
+    border-radius: 15px;
+}
+
+.song-player {
+    display: flex;
+    justify-content: center;
+}
+
+.skip-button {
+    position: absolute;
+    right: 40px;
+}
