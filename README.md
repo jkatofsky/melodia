@@ -16,6 +16,7 @@ Built with:
 ## TODO
 
 - [ ] fix music playback grey-out bug
+- [ ] fix the prod 400 bug!!! (only first action after refresh works)
 - [ ] make devpost description more mental-health-y
 - [ ] add favicons, meta tags to both homepage and react app
 - [ ] fix homepage button spacing
