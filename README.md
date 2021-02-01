@@ -15,10 +15,19 @@ Built with:
 
 ## TODO
 
-- [ ] fix the prod 400 bug!!! (only first action after refresh works)
-- [ ] make devpost description more mental-health-y
-- [ ] add favicons to homepage
-- [ ] all TODOs in the code itself
+- [ ] fix the prod 400 bug!!!
+- [ ] revisit song playback syncing! a rough idea for how to maybe implement it:
+  - download currently playing song file locally (& temporarily) to server
+  - is_playing flag in `Queue`
+  - `last_streamed_byte` in `Queue` -> updated when `Queue` is paused?
+  - websocket route that streams the song file, using `last_streamed_byte`, to all clients in room, if `is_playing`
+- [ ] bring the homepage into the react app & use routing
+- [ ] more informative loading state on client & request validation on server
+- [ ] use material UI?
+- [ ] use React context?
+- [ ] delete room/Queue after everyone leaves? or after a period of time?
 - [ ] fix homepage button spacing
-- [ ] 'copy link/id to clip board' button on room
+- [ ] 'copy link to clipboard' and 'copy id to clipboard' buttons on room page
 - [ ] 'go to homepage' button on room
+- [ ] display # of people currently in room? room chat? naming of rooms/users? authentication?
+- [ ] modal that provides more information about a given song?

@@ -9,9 +9,6 @@ import Queue from './components/Queue';
 import Header from './components/Header';
 import { SERVER_URL } from './util/api.js';
 
-// TODO: revisit whether or not I should have an explicit loading flag
-// TODO: revisit how to render loading state
-
 class App extends Component {
     constructor(props) {
         super(props);

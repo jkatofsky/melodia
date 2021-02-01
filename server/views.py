@@ -26,8 +26,6 @@ def create_room():
 def search_songs(query):
     return jsonify({'results': get_search_results(query)})
 
-
-#TODO: delete the room when no one's in it
  
 @socketio.on('join')
 def on_join(room_id):
