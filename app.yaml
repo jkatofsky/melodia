@@ -2,14 +2,10 @@ runtime: python
 
 env: flex
 
+runtime_config:
+    python_version: 3
+
 network:
   session_affinity: true
 
-runtime_config:
-  python_version: 3.7
-
-# entrypoint: gunicorn --worker-class eventlet -w 1 main:app
-
-# entrypoint: gunicorn -k gevent -w 1 main:app
-
-entrypoint: gunicorn -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 main:app
+entrypoint: gunicorn --worker-class eventlet -w 1 main:app

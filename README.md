@@ -15,7 +15,6 @@ Built with:
 
 ## TODO
 
-- [ ] fix the prod 400 bug!!!
 - [ ] revisit song playback syncing! a rough idea for how to maybe implement it:
   - download currently playing song file locally (& temporarily) to server
   - is_playing flag in `Queue`
