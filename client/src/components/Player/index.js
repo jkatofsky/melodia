@@ -8,20 +8,17 @@ import './style.css';
 class Player extends Component {
 
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate(prevProps) {
         const { song } = this.props;
 
-        const audio = document.getElementById('audio');
-        const audioSource = document.getElementById('audio-source');
-
         if (!song) {
-            audioSource.src = "";
-            audio.load();
+            this.audioSource.src = "";
+            this.audio.load();
         }
         else if ((!prevProps.song) || (prevProps.song.id !== song.id)) {
-            audioSource.src = song.preview;
-            audio.load();
-            audio.play();
+            this.audioSource.src = song.preview;
+            this.audio.load();
+            this.audio.play();
         }
 
     }
@@ -48,8 +45,8 @@ class Player extends Component {
                 }
             </div>
             <div className='song-player'>
-                <audio id='audio' controls>
-                    <source id='audio-source' src="" type='audio/mp3' />
+                <audio id='audio' controls ref={ref => this.audio = ref}>
+                    <source id='audio-source' src="" type='audio/mp3' ref={ref => this.audioSource = ref} />
                 </audio>
             </div>
         </>;

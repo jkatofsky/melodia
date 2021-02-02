@@ -2,7 +2,7 @@
 
 Passing the aux, virtually: a web app that enables real-time collaboration on a queue of music with your friends.
 
-Made in 36 hours for the McHacks 8 hackathon by Josh Katofsky and Adam Gmell.
+Started during the McHacks 8 hackathon, with further features in development.
 
 Built with:
 
@@ -26,6 +26,8 @@ Built with:
   - another idea
     - on change of playback state (song time or play/pause), send event to server, begin client loading state, but use response event (sent to everyone in room) to update playback
     - on client join, server asks other clients (which client? all of them, averaged?) for their time. clients give their time and begin loading state, waiting for playback update event that's sent to everybody
+  - like the above idea but with P2P stuff? Peer.js?
+    - programattically assign a leader client that's a source of truth? how to change it when they leave?
   - inspiration can be found [here](https://stackoverflow.com/questions/23396575/node-socket-live-audio-stream-broadcast/26029102#26029102) and [here](https://stackoverflow.com/questions/56198688/how-to-synchronize-a-music-player-to-multiple-clients-in-nodejs) and [here](https://stackoverflow.com/questions/29066117/streaming-a-file-from-server-to-client-with-socket-io-stream)
 - [ ] bring the homepage into the react app & use routing
 - [ ] more informative loading state on client & request validation on server
@@ -37,3 +39,5 @@ Built with:
 - [ ] 'go to homepage' button on room
 - [ ] display # of people currently in room? room chat? naming of rooms/users? authentication?
 - [ ] modal that provides more information about a given song?
+- [ ] drag-and-drop song reordering
+- [ ] fix the autoplay not working bug
