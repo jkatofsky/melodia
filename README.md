@@ -15,11 +15,18 @@ Built with:
 
 ## TODO
 
+- [ ] prod bug where sometimes state isn't pushed to others in the room
+- [ ] add clear search button
 - [ ] revisit song playback syncing! a rough idea for how to maybe implement it:
-  - download currently playing song file locally (& temporarily) to server
-  - is_playing flag in `Queue`
-  - `last_streamed_byte` in `Queue` -> updated when `Queue` is paused?
-  - websocket route that streams the song file, using `last_streamed_byte`, to all clients in room, if `is_playing`
+  - one idea
+    - download currently playing song file locally (& temporarily) to server
+    - is_playing flag in `Queue`
+    - `last_streamed_byte` in `Queue` -> updated when playback `Queue` is paused/moved?
+    - websocket route that streams the song file, using `last_streamed_byte`, to all clients in room, if `is_playing`
+  - another idea
+    - on change of playback state (song time or play/pause), send event to server, begin client loading state, but use response event (sent to everyone in room) to update playback
+    - on client join, server asks other clients (which client? all of them, averaged?) for their time. clients give their time and begin loading state, waiting for playback update event that's sent to everybody
+  - inspiration can be found [here](https://stackoverflow.com/questions/23396575/node-socket-live-audio-stream-broadcast/26029102#26029102) and [here](https://stackoverflow.com/questions/56198688/how-to-synchronize-a-music-player-to-multiple-clients-in-nodejs) and [here](https://stackoverflow.com/questions/29066117/streaming-a-file-from-server-to-client-with-socket-io-stream)
 - [ ] bring the homepage into the react app & use routing
 - [ ] more informative loading state on client & request validation on server
 - [ ] use material UI?
