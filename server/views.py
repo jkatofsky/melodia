@@ -1,8 +1,8 @@
 from .app import app, socketio
 from .models import *
 
-from mongoengine.queryset.visitor import Q
 import json
+from mongoengine.queryset.visitor import Q
 from flask import request, jsonify
 from flask_socketio import join_room, leave_room, emit
 
@@ -25,14 +25,6 @@ def search_songs(query):
     return jsonify({'results': get_search_results(query)})
 
 
-
-# TODO: where i left off implementnig the state sync:
-# need to fix the fact that often, none of the sids of the current clients are the source of truth
-# this makes it such that there is no client to respond to 'playback-state-request', so new room joins don't ever get-room-state
-# could very likely have to do with the disconnect handler not working
-# once that is sorted, I forsee I will have a lot of debugging to do regarding the HTML audio element
-
-
 # these three events need to handle assigning the source of truth and getting new joins up to date with the playback state
 
 @socketio.on('join')
@@ -41,7 +33,8 @@ def on_join(room_id):
 
     if not room.source_of_truth_sid:
         room.source_of_truth_sid = request.sid
-        emit('get-room-state', room_state_dict(room, to_source_of_truth=True), room=request.sid)
+        emit('notify-as-source-of-truth', room=request.sid)
+        emit('get-room-state', room_state_dict(room), room=request.sid)
     else:
         room.other_participant_sids.append(request.sid)
         emit('playback-state-request', request.sid, room=room.source_of_truth_sid)
@@ -53,12 +46,13 @@ def on_join(room_id):
 def on_leave_or_disconnect(room_id, sid):
     room: Room = Room.objects.get_or_404(pk=room_id)
 
-    if request.sid == room.source_of_truth_sid:
+    if sid == room.source_of_truth_sid:
         if len(room.other_participant_sids) == 0:
             room.source_of_truth_sid = None
             room.is_playing = False
         else:
             room.source_of_truth_sid = room.other_participant_sids.pop(0)
+            socketio.emit('notify-as-source-of-truth', room=room.source_of_truth_sid)
     else:
         room.other_participant_sids.remove(sid)
 
@@ -73,10 +67,8 @@ def on_leave(room_id):
 
 @socketio.on('disconnect')
 def on_disconnect():
-    print('disconnecting', request.sid)
     room_id = Room.objects.get(Q(source_of_truth_sid=request.sid)|Q(other_participant_sids=request.sid)).id
     on_leave_or_disconnect(room_id, request.sid)
-    leave_room(room_id)
 
 
 @socketio.on('playback-state-response')

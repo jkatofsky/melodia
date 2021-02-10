@@ -1,10 +1,8 @@
-from requests import api
 from .app import db
 import requests
 import json
 
 API_URL = 'https://api.deezer.com'
-
 
 
 def api_song_to_schema(api_song, search_result=False):
@@ -49,8 +47,6 @@ class Room(db.Document):
     last_updated_playback_time = db.FloatField(default=0)
 
 
-def room_state_dict(room: Room, to_source_of_truth=False):
-    ret = {'queue' : [json.loads(song.to_json()) for song in room.queue], 'is_playing': room.is_playing, 'playback_time': room.last_updated_playback_time}
-    if to_source_of_truth:
-        ret['is_source_of_truth'] = True
-    return ret
+def room_state_dict(room: Room):
+    return {'queue' : [json.loads(song.to_json()) for song in room.queue], \
+        'is_playing': room.is_playing, 'playback_time': room.last_updated_playback_time}

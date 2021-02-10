@@ -30,11 +30,13 @@ class App extends Component {
         socket.on('connect', () => {
             socket.emit('join', this.roomID);
         });
+        socket.on('notify-as-source-of-truth', () => {
+            this.setState({ isSourceOfTruth: true });
+        })
         socket.on('get-room-state', (roomState) => {
             //TODO: diff these things to reduce unecessary re-renders
             console.log(roomState)
             this.setState({
-                isSourceOfTruth: roomState.is_source_of_truth,
                 queue: roomState.queue,
                 lastUpdatedPlaybackTime: roomState.last_updated_playback_time,
                 isPlaying: roomState.is_playing
