@@ -17,9 +17,9 @@ Built with:
 
 For sure:
 
-- [ ] finish the implementation of my more ambitious syncing system
+- [ ] finish the implementation of my more ambitious syncing system (split views.py into 3 files - something like ws_client.py, ws_roomstate.py, and views.py)
 - [ ] use React context! state management is getting hairy
-- [ ] bring the homepage into the react app & use routing
+- [ ] bring the homepage into the react app & use react-router
 - [ ] more informative loading state on client & request validation on server
 - [ ] use material UI!
 - [ ] add clear search button

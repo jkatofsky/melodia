@@ -21,7 +21,6 @@ def get_search_results(query):
     return [api_song_to_schema(api_song, search_result=True) for api_song in response['data']]
 
 
-
 class Song(db.Document):
     api_id = db.StringField()
     title = db.StringField()

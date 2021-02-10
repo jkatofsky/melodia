@@ -37,7 +37,7 @@ def on_join(room_id):
         emit('get-room-state', room_state_dict(room), room=request.sid)
     else:
         room.other_participant_sids.append(request.sid)
-        emit('playback-state-request', request.sid, room=room.source_of_truth_sid)
+        emit('playback-state-request', room=room.source_of_truth_sid)
 
     join_room(room_id)
     room.save()
@@ -74,6 +74,7 @@ def on_disconnect():
 @socketio.on('playback-state-response')
 def on_playback_state_response(room_id, is_playing, playback_time):
     room: Room = Room.objects.get_or_404(pk=room_id)
+
     room.is_playing = is_playing
     room.last_updated_playback_time = playback_time
     room.save()
@@ -86,6 +87,7 @@ def on_playback_state_response(room_id, is_playing, playback_time):
 @socketio.on('toggle-play-pause')
 def on_toggle_play(room_id):
     room: Room = Room.objects.get_or_404(pk=room_id)
+
     room.is_playing = not room.is_playing
     room.save()
 
@@ -95,6 +97,7 @@ def on_toggle_play(room_id):
 @socketio.on('change-playback-time')
 def on_change_playback_time(room_id, new_time):
     room: Room = Room.objects.get_or_404(pk=room_id)
+
     room.last_updated_playback_time = new_time
     room.save()
 
@@ -104,6 +107,7 @@ def on_change_playback_time(room_id, new_time):
 @socketio.on('play-song')
 def play_song(room_id, at_index):
     room: Room = Room.objects.get_or_404(pk=room_id)
+
     room.queue = room.queue[at_index:]
     room.save()
 
@@ -115,7 +119,6 @@ def queue_song(room_id, song_api_id):
     room: Room = Room.objects.get_or_404(pk=room_id)
 
     song = save_song_to_db(song_api_id)
-
     room.queue.append(song)
     room.save()
 
@@ -125,6 +128,7 @@ def queue_song(room_id, song_api_id):
 @socketio.on('remove-song')
 def remove_song(room_id, at_index):
     room: Room = Room.objects.get_or_404(pk=room_id)
+    
     room.queue.pop(at_index)
     room.save()
 
