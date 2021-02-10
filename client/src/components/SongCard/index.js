@@ -11,11 +11,11 @@ function SongCard(props) {
 
     return <div className="song-card" >
         <div className="song-card-info">
-            <img src={song.album.cover_small} alt="" />
+            <img src={song.cover_small} alt="" />
             <div>
                 <h5>{song.title}</h5>
-                <p>{limitLength(song.album.title)}</p>
-                <p>{song.artist.name}</p>
+                <p>{limitLength(song.title)}</p>
+                <p>{song.artist}</p>
             </div>
         </div>
         {buttons &&

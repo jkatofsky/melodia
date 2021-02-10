@@ -64,8 +64,8 @@ class Search extends Component {
             <div className='songs-wrapper'>
                 {!loading ?
                     songs.map(song => (
-                        <SongCard key={song.id} song={song} buttons={
-                            <button onClick={() => onQueueSong(song.id)} className='button'>
+                        <SongCard key={song.api_id} song={song} buttons={
+                            <button onClick={() => onQueueSong(song.api_id)} className='button'>
                                 <MdQueueMusic className='icon' size={30} />
                             </button>
                         } />
