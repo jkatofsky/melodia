@@ -7,35 +7,50 @@ import './style.css';
 
 class Player extends Component {
 
-    componentDidUpdate(prevProps) {
-        const { socket, roomID, song, isPlaying, lastUpdatedPlaybackTime } = this.props;
+    componentDidMount() {
+        const { socket, song } = this.props;
+        if (socket) {
+            this.setPlaybackEvents();
+        }
+        if (song) {
+            this.audioSource.src = song.source;
+            this.audio.load();
+        }
+    }
 
-        //only define define this event when we get the socket
+    componentDidUpdate(prevProps) {
+        const { socket, song, isPlaying, lastUpdatedPlaybackTime } = this.props;
+
         if (prevProps.socket !== socket) {
-            socket.on('playback-state-request', () => {
-                socket.emit('playback-state-response', roomID, !this.audio.paused, this.audio.currentTime)
-            })
+            this.setPlaybackEvents();
         }
 
         if (!song) {
             this.audioSource.src = "";
             this.audio.load();
-        }
-        else if ((!prevProps.song) || (prevProps.song.id !== song.id)) {
-            this.audioSource.src = song.preview;
+        } else if ((!prevProps.song) || (prevProps.song.api_id !== song.api_id)) {
+            this.audioSource.src = song.source;
             this.audio.load();
-            this.audio.play();
-        } else if (prevProps.isPlaying !== isPlaying) {
+        }
+        if (prevProps.isPlaying !== isPlaying) {
             if (isPlaying) this.audio.play();
             else this.audio.pause()
-        } else if (prevProps.lastUpdatedPlaybackTime !== lastUpdatedPlaybackTime) {
+        }
+        if (lastUpdatedPlaybackTime && prevProps.lastUpdatedPlaybackTime !== lastUpdatedPlaybackTime) {
             this.audio.currentTime = lastUpdatedPlaybackTime;
         }
     }
 
+    setPlaybackEvents = () => {
+        const { socket, roomID } = this.props;
+        socket.on('playback-state-request', (forSID) => {
+            socket.emit('playback-state-response', roomID, forSID, !this.audio.paused, this.audio.currentTime)
+        })
+    }
+
     render() {
 
-        const { song, onSongSkip, emptyQueue, onTogglePlayPause, onPlaybackTimeChange, onSongFinish } = this.props;
+        const { song, onSongSkip, emptyQueue, onSetPlaying, onPlaybackTimeChange, onSongFinish } = this.props;
 
         return <>
             <div className='song-player-info'>
@@ -56,8 +71,9 @@ class Player extends Component {
             </div>
             <div className='song-player'>
                 <audio id='audio' controls ref={ref => this.audio = ref}
-                    onPause={() => onTogglePlayPause()}
-                    onTimeUpdate={() => onPlaybackTimeChange(this.audio.currentTime)}
+                    onPlay={() => onSetPlaying(true)}
+                    onPause={() => onSetPlaying(false)}
+                    onSeeked={() => onPlaybackTimeChange(this.audio.currentTime)}
                     onEnded={() => onSongFinish()}>
                     <source id='audio-source' src="" type='audio/mp3' ref={ref => this.audioSource = ref} />
                 </audio>
@@ -75,7 +91,7 @@ Player.propTypes = {
     isPlaying: PropTypes.bool.isRequired,
     lastUpdatedPlaybackTime: PropTypes.number.isRequired,
     emptyQueue: PropTypes.bool.isRequired,
-    onTogglePlayPause: PropTypes.func.isRequired,
+    onSetPlaying: PropTypes.func.isRequired,
     onPlaybackTimeChange: PropTypes.func.isRequired,
     onSongSkip: PropTypes.func.isRequired,
     onSongFinish: PropTypes.func.isRequired

@@ -17,6 +17,7 @@ class App extends Component {
         this.roomID = url.substring(url.lastIndexOf('/') + 1);
 
         this.state = {
+            roomEntered: false,
             socket: null,
             isSourceOfTruth: false,
             queue: [],
@@ -30,6 +31,9 @@ class App extends Component {
         socket.on('connect', () => {
             socket.emit('join', this.roomID);
         });
+        socket.on('disconnect', () => {
+            this.disconnectSocket()
+        })
         socket.on('notify-as-source-of-truth', () => {
             this.setState({ isSourceOfTruth: true });
         })
@@ -42,8 +46,8 @@ class App extends Component {
                 isPlaying: roomState.is_playing
             })
         })
-        socket.on('play-pause-toggled', () => {
-            this.setState(state => ({ isPlaying: !state.isPlaying }));
+        socket.on('playing-set', (isPlaying) => {
+            this.setState({ isPlaying });
         })
         socket.on('playback-time-changed', (newTime) => {
             this.setState({ lastUpdatedPlaybackTime: newTime });
@@ -65,10 +69,19 @@ class App extends Component {
         this.setState({ socket });
     }
 
-    componentWillUnmount() {
+    disconnectSocket = () => {
         const { socket } = this.state;
         socket.emit('leave', this.roomID);
         socket.disconnect();
+    }
+
+    componentWillUnmount() {
+        this.disconnectSocket()
+    }
+
+    componentDidCatch(error, errorInfo) {
+        this.disconnectSocket()
+        console.error(errorInfo)
     }
 
     emitData = (endpoint, ...args) => {
@@ -84,52 +97,54 @@ class App extends Component {
 
     render() {
 
-        const { isSourceOfTruth, socket, queue, isPlaying, lastUpdatedPlaybackTime } = this.state;
+        const { roomEntered, isSourceOfTruth, socket, queue, isPlaying, lastUpdatedPlaybackTime } = this.state;
 
         return <>
             <Header />
-            <Container>
-                <Row>
-                    <Col lg={4}>
-                        <div className='section'>
-                            <Search onQueueSong={(songID) => this.emitData('queue-song', songID)} />
-                        </div>
-                    </Col>
+            {!roomEntered ? <button onClick={() => this.setState({ roomEntered: true })}>Enter room</button> :
+                <Container>
+                    <Row>
+                        <Col lg={4}>
+                            <div className='section'>
+                                <Search onQueueSong={(songID) => this.emitData('queue-song', songID)} />
+                            </div>
+                        </Col>
 
-                    <Col lg={4}>
-                        <div className='section'>
-                            <Player roomID={this.roomID}
-                                socket={socket}
-                                song={queue.length > 0 ? queue[0] : null}
-                                isPlaying={isPlaying}
-                                lastUpdatedPlaybackTime={lastUpdatedPlaybackTime}
-                                emptyQueue={queue.length <= 1}
-                                onTogglePlayPause={() => this.emitData('toggle-play-pause')}
-                                onPlaybackTimeChange={(newTime) => {
-                                    if (newTime !== lastUpdatedPlaybackTime)
-                                        this.emitData('change-playback-time', newTime)
-                                }}
-                                onSongSkip={this.playNextSong}
-                                onSongFinish={() => {
-                                    if (isSourceOfTruth) {
-                                        this.playNextSong()
-                                    }
-                                }} />
-                        </div>
-                    </Col>
+                        <Col lg={4}>
+                            <div className='section'>
+                                <Player roomID={this.roomID}
+                                    socket={socket}
+                                    song={queue.length > 0 ? queue[0] : null}
+                                    isPlaying={isPlaying}
+                                    lastUpdatedPlaybackTime={lastUpdatedPlaybackTime}
+                                    emptyQueue={queue.length <= 1}
+                                    onSetPlaying={(isPlaying) => this.emitData('set-playing', isPlaying)}
+                                    onPlaybackTimeChange={(newTime) => {
+                                        if (newTime !== lastUpdatedPlaybackTime)
+                                            this.emitData('change-playback-time', newTime)
+                                    }}
+                                    onSongSkip={this.playNextSong}
+                                    onSongFinish={() => {
+                                        if (isSourceOfTruth) {
+                                            this.playNextSong()
+                                        }
+                                    }} />
+                            </div>
+                        </Col>
 
-                    <Col lg={4}>
-                        <div className='section'>
-                            <Queue songs={queue.slice(1)}
-                                onPlaySong={(atIndex) =>
-                                    this.emitData('play-song', atIndex + 1)}
-                                onRemoveSong={(atIndex) =>
-                                    this.emitData('remove-song', atIndex + 1)} />
-                        </div>
-                    </Col>
+                        <Col lg={4}>
+                            <div className='section'>
+                                <Queue songs={queue.slice(1)}
+                                    onPlaySong={(atIndex) =>
+                                        this.emitData('play-song', atIndex + 1)}
+                                    onRemoveSong={(atIndex) =>
+                                        this.emitData('remove-song', atIndex + 1)} />
+                            </div>
+                        </Col>
 
-                </Row>
-            </Container>
+                    </Row>
+                </Container>
+            }
         </>;
     }
 }

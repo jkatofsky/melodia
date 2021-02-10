@@ -7,10 +7,9 @@ Started during the McHacks 8 hackathon, with further features in development.
 Built with:
 
 - [Flask](https://palletsprojects.com/p/flask/)
-- [Flask-MongoEngine](http://docs.mongoengine.org/projects/flask-mongoengine/en/latest/)
-- [flask-socketio](https://en.wikipedia.org/wiki/WebSocket)
-- [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
-- [React](https://reactjs.org/)
+- [MongoDB](https://www.mongodb.com/) ([MongoEngine](http://mongoengine.org/))
+- [socketio](https://socket.io/)
+- [React](https://reactjs.org/) ([Material UI](https://material-ui.com/))
 - [Google App Engine](https://cloud.google.com/appengine)
 
 ## TODO
