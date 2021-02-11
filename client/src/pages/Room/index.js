@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
+import { io } from "socket.io-client";
+import { Container, Row, Col } from 'react-grid-system';
+import { withRouter } from 'react-router-dom';
+
+import RoomContext from './context.js';
 import Search from '../../components/Search'
 import Player from '../../components/Player';
 import Queue from '../../components/Queue';
 import Header from '../../components/Header';
 import { SERVER_URL } from '../../util/api.js';
-import { io } from "socket.io-client";
-import { Container, Row, Col } from 'react-grid-system';
-import { withRouter } from 'react-router-dom';
-
 import './style.css';
 
 class Room extends Component {
@@ -16,39 +17,57 @@ class Room extends Component {
 
         this.roomID = this.props.match.params.id;
 
-        this.state = {
-            roomEntered: false,
-            socket: null,
+        this.initialRoomContext = {
+            emitData: this.emitData,
             isSourceOfTruth: false,
             queue: [],
-            lastUpdatedPlaybackTime: 0,
-            isPlaying: false
+            lastSeekedTime: 0,
+            isPlaying: false,
+            playbackStateResponded: this.playbackStateResponded,
+            needPlaybackStateFor: null,
+        }
+
+        this.state = {
+            loading: false,
+            loadingMessage: 'Connecting to server...',
+            ...this.initialRoomContext
         }
     }
 
+    //all handlers happen here
+    //all emits (other than join/leave) happen in components
+
     componentDidMount() {
         const socket = io(SERVER_URL, { transports: ['websocket'] });
+        this.socket = socket;
+
         socket.on('connect', () => {
-            socket.emit('join', this.roomID);
+            this.setState({ loadingMessage: 'Joining room...' })
+            this.emitData('join')
         });
+        socket.on('get-room-state', (roomState) => {
+            this.setState({
+                loadingMessage: '',
+                loading: false,
+                queue: roomState.queue,
+                lastSeekedTime: roomState.last_seeked_time,
+                isPlaying: roomState.is_playing
+            })
+        })
+        socket.on('playback-state-request', (forSID) => {
+            this.setState({ needPlaybackStateFor: forSID });
+        })
         socket.on('disconnect', () => {
             this.disconnectSocket()
         })
         socket.on('notify-as-source-of-truth', () => {
             this.setState({ isSourceOfTruth: true });
         })
-        socket.on('get-room-state', (roomState) => {
-            this.setState({
-                queue: roomState.queue,
-                lastUpdatedPlaybackTime: roomState.last_updated_playback_time,
-                isPlaying: roomState.is_playing
-            })
-        })
         socket.on('playing-set', (isPlaying) => {
             this.setState({ isPlaying });
         })
-        socket.on('playback-time-changed', (newTime) => {
-            this.setState({ lastUpdatedPlaybackTime: newTime });
+        socket.on('seek-time-changed', (newTime) => {
+            this.setState({ lastSeekedTime: newTime });
         })
         socket.on('song-played', (atIndex) => {
             const { queue } = this.state;
@@ -64,13 +83,6 @@ class Room extends Component {
             queue.splice(atIndex, 1);
             this.setState({ queue });
         })
-        this.setState({ socket });
-    }
-
-    disconnectSocket = () => {
-        const { socket } = this.state;
-        socket.emit('leave', this.roomID);
-        socket.disconnect();
     }
 
     componentWillUnmount() {
@@ -82,67 +94,63 @@ class Room extends Component {
         console.error(errorInfo)
     }
 
-    emitData = (endpoint, ...args) => {
-        const { socket } = this.state;
-        socket.emit(endpoint, this.roomID, ...args);
+    getContextValue = () => {
+        const value = {};
+        Object.keys(this.initialRoomContext).map(key =>
+            value[key] = this.state[key])
+        return value;
     }
 
-    playNextSong = () => {
-        const { queue } = this.state;
-        if (queue.length > 1) this.emitData('play-song', 1)
-        else this.emitData('remove-song', 0)
+    emitData = (endpoint, ...args) => {
+        if (this.socket)
+            this.socket.emit(endpoint, this.roomID, ...args);
+    }
+
+    playbackStateResponded = () => {
+        this.setState({ needPlaybackStateFor: null });
+    }
+
+    disconnectSocket = () => {
+        this.emitData('leave')
+        this.socket.disconnect();
     }
 
     render() {
-
-        const { roomEntered, isSourceOfTruth, socket, queue, isPlaying, lastUpdatedPlaybackTime } = this.state;
-
         return <>
             <Header />
-            {!roomEntered ? <button onClick={() => this.setState({ roomEntered: true })}>Enter room</button> :
+
+            {/* TODO: need some solution to stop complaning about auto-playing music 
+            before the users interacts w/ html */}
+
+            {/* TODO: need a render fallback for loading state */}
+
+            {/* TODO: all of the loading stuff that relies on the local Room state (as opposed to the context)
+            will be rendered here OUTSIDE of the context provider*/}
+
+            <RoomContext.Provider value={this.getContextValue()}>
+
                 <Container>
                     <Row>
                         <Col lg={4}>
                             <div className='section'>
-                                <Search onQueueSong={(songID) => this.emitData('queue-song', songID)} />
+                                <Search />
                             </div>
                         </Col>
-
                         <Col lg={4}>
                             <div className='section'>
-                                <Player roomID={this.roomID}
-                                    socket={socket}
-                                    song={queue.length > 0 ? queue[0] : null}
-                                    isPlaying={isPlaying}
-                                    lastUpdatedPlaybackTime={lastUpdatedPlaybackTime}
-                                    emptyQueue={queue.length <= 1}
-                                    onSetPlaying={(isPlaying) => this.emitData('set-playing', isPlaying)}
-                                    onPlaybackTimeChange={(newTime) => {
-                                        if (newTime !== lastUpdatedPlaybackTime)
-                                            this.emitData('change-playback-time', newTime)
-                                    }}
-                                    onSongSkip={this.playNextSong}
-                                    onSongFinish={() => {
-                                        if (isSourceOfTruth) {
-                                            this.playNextSong()
-                                        }
-                                    }} />
+                                <Player />
                             </div>
                         </Col>
-
                         <Col lg={4}>
                             <div className='section'>
-                                <Queue songs={queue.slice(1)}
-                                    onPlaySong={(atIndex) =>
-                                        this.emitData('play-song', atIndex + 1)}
-                                    onRemoveSong={(atIndex) =>
-                                        this.emitData('remove-song', atIndex + 1)} />
+                                <Queue />
                             </div>
                         </Col>
-
                     </Row>
                 </Container>
-            }
+
+            </RoomContext.Provider>
+
         </>;
     }
 }

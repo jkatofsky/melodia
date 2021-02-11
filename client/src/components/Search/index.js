@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import { SERVER_URL } from '../../util/api.js';
-import PropTypes from 'prop-types';
 import { MdQueueMusic } from 'react-icons/md';
 
+import RoomContext from '../../pages/Room/context.js';
 import SongCard from '../SongCard';
 import './style.css';
 
 class Search extends Component {
+
+    static contextType = RoomContext;
 
     constructor(props) {
         super(props);
@@ -52,7 +54,7 @@ class Search extends Component {
 
     render() {
 
-        const { onQueueSong } = this.props;
+        const { emitData } = this.context;
         const { loading, songs } = this.state;
 
 
@@ -65,7 +67,7 @@ class Search extends Component {
                 {!loading ?
                     songs.map(song => (
                         <SongCard key={song.api_id} song={song} buttons={
-                            <button onClick={() => onQueueSong(song.api_id)} className='button'>
+                            <button onClick={() => emitData('queue-song', song.api_id)} className='button'>
                                 <MdQueueMusic className='icon' size={30} />
                             </button>
                         } />
@@ -74,10 +76,6 @@ class Search extends Component {
             </div>
         </>
     }
-}
-
-Search.propTypes = {
-    onQueueSong: PropTypes.func.isRequired
 }
 
 export default Search;

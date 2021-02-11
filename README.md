@@ -17,7 +17,6 @@ Built with:
 For sure:
 
 - [ ] finish the implementation of my more ambitious syncing system
-- [ ] use redux for state management
 - [ ] more informative loading state on client & request validation on server
 - [ ] use material UI!
 - [ ] add clear search button

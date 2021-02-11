@@ -15,14 +15,14 @@ def on_toggle_play(room_id, is_playing):
     emit('playing-set', room.is_playing, room=room_id, include_self=True)
 
 
-@socketio.on('change-playback-time')
+@socketio.on('change-seek-time')
 def on_change_playback_time(room_id, new_time):
     room: Room = Room.objects.get_or_404(pk=room_id)
 
-    room.last_updated_playback_time = new_time
+    room.last_seeked_time = new_time
     room.save()
 
-    emit('playback-time-changed', new_time, room=room_id, include_self=True)
+    emit('seek-time-changed', new_time, room=room_id, include_self=True)
 
 
 @socketio.on('play-song')

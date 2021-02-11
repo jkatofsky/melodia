@@ -1,24 +1,32 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import SongCard from '../SongCard';
 import { MdDelete, MdPlayArrow } from 'react-icons/md';
 
-
+import RoomContext from '../../pages/Room/context.js';
 
 class Queue extends Component {
+
+    static contextType = RoomContext;
+
+    songs = (queue) => queue.length > 2 ? queue.slice(1) : null;
+
     render() {
-        const { songs, onPlaySong, onRemoveSong } = this.props;
+        console.log(this.context);
+        const { queue, emitData } = this.context;
+
+        const songs = this.songs(queue);
+
         return <>
             <h2><u>Up Next</u></h2>
             <div className='songs-wrapper'>
-                {songs.length > 0 ?
+                {songs ?
                     songs.map((song, index) =>
                         <SongCard key={index} song={song} buttons={
                             <>
-                                <button onClick={() => onPlaySong(index)} className='button'>
+                                <button onClick={() => emitData('play-song', index + 1)} className='button'>
                                     <MdPlayArrow className='icon' size={15} />
                                 </button>
-                                <button onClick={() => onRemoveSong(index)} className='button'>
+                                <button onClick={() => emitData('remove-song', index + 1)} className='button'>
                                     <MdDelete className='icon' size={15} />
                                 </button>
                             </>
@@ -27,14 +35,10 @@ class Queue extends Component {
                     <p className='notice'>No songs yet</p>
                 }
             </div>
-        </>;
+        </>
+
     }
 }
 
-Queue.propTypes = {
-    songs: PropTypes.array,
-    onPlaySong: PropTypes.func.isRequired,
-    onRemoveSong: PropTypes.func.isRequired,
-}
 
 export default Queue;

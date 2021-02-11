@@ -43,9 +43,9 @@ class Room(db.Document):
     source_of_truth_sid = db.StringField()
     other_participant_sids = db.ListField(db.StringField(), default=list)
     is_playing = db.BooleanField(default=False)
-    last_updated_playback_time = db.FloatField(default=0)
+    last_seeked_time = db.FloatField(default=0)
 
 
 def room_state_dict(room: Room):
     return {'queue' : [json.loads(song.to_json()) for song in room.queue], \
-        'is_playing': room.is_playing, 'playback_time': room.last_updated_playback_time}
+        'is_playing': room.is_playing, 'playback_time': room.last_seeked_time}
