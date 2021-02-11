@@ -18,6 +18,7 @@ def on_join(room_id):
         room.other_participant_sids.append(request.sid)
         emit('playback-state-request', request.sid, room=room.source_of_truth_sid)
 
+    # TODO: remove when done testing
     print('joined sid', request.sid)
     print('joined sot', room.source_of_truth_sid)
     print('joined others', room.other_participant_sids)
@@ -38,6 +39,7 @@ def on_leave_or_disconnect(room_id, sid):
     else:
         room.other_participant_sids.remove(sid)
 
+    # TODO: remove when done testing
     print('leave sid', request.sid)
     print('leave sot', room.source_of_truth_sid)
     print('leave others', room.other_participant_sids)
