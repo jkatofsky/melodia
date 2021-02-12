@@ -28,7 +28,7 @@ class Room extends Component {
         }
 
         this.state = {
-            loading: false,
+            loading: true,
             loadingMessage: 'Connecting to server...',
             ...this.initialRoomContext
         }
@@ -55,7 +55,8 @@ class Room extends Component {
             })
         })
         socket.on('playback-state-request', (forSID) => {
-            this.setState({ needPlaybackStateFor: forSID });
+            if (this.state.isSourceOfTruth)
+                this.setState({ needPlaybackStateFor: forSID });
         })
         socket.on('disconnect', () => {
             this.disconnectSocket()
@@ -101,6 +102,7 @@ class Room extends Component {
         return value;
     }
 
+
     emitData = (endpoint, ...args) => {
         if (this.socket)
             this.socket.emit(endpoint, this.roomID, ...args);
@@ -116,41 +118,44 @@ class Room extends Component {
     }
 
     render() {
+
+        const { loading, loadingMessage } = this.state;
+
         return <>
             <Header />
 
             {/* TODO: need some solution to stop complaning about auto-playing music 
             before the users interacts w/ html */}
 
-            {/* TODO: need a render fallback for loading state */}
+            {/* TODO: need a render fallback (and server stuff) for invalid room state */}
 
-            {/* TODO: all of the loading stuff that relies on the local Room state (as opposed to the context)
-            will be rendered here OUTSIDE of the context provider*/}
+            {loading ?
+                <h2>{loadingMessage}</h2>
+                :
+                <RoomContext.Provider value={this.getContextValue()}>
 
-            <RoomContext.Provider value={this.getContextValue()}>
+                    <Container>
+                        <Row>
+                            <Col lg={4}>
+                                <div className='section'>
+                                    <Search />
+                                </div>
+                            </Col>
+                            <Col lg={4}>
+                                <div className='section'>
+                                    <Player />
+                                </div>
+                            </Col>
+                            <Col lg={4}>
+                                <div className='section'>
+                                    <Queue />
+                                </div>
+                            </Col>
+                        </Row>
+                    </Container>
 
-                <Container>
-                    <Row>
-                        <Col lg={4}>
-                            <div className='section'>
-                                <Search />
-                            </div>
-                        </Col>
-                        <Col lg={4}>
-                            <div className='section'>
-                                <Player />
-                            </div>
-                        </Col>
-                        <Col lg={4}>
-                            <div className='section'>
-                                <Queue />
-                            </div>
-                        </Col>
-                    </Row>
-                </Container>
-
-            </RoomContext.Provider>
-
+                </RoomContext.Provider>
+            }
         </>;
     }
 }
