@@ -41,7 +41,7 @@ def save_song_to_db(song_api_id):
 class Room(db.Document):
     queue = db.ListField(db.ReferenceField(Song), default=list)
     source_of_truth_sid = db.StringField()
-    other_participant_sids = db.ListField(db.StringField(), default=list)
+    other_client_sids = db.ListField(db.StringField(), default=list)
     is_playing = db.BooleanField(default=False)
     last_seeked_time = db.FloatField(default=0)
 

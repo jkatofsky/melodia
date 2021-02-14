@@ -4,6 +4,7 @@ from .models import Room, save_song_to_db
 import json
 from flask_socketio import emit
 
+# TODO: for remove and play, delete songs from the DB!
 
 @socketio.on('set-playing')
 def on_toggle_play(room_id, is_playing):
@@ -15,14 +16,14 @@ def on_toggle_play(room_id, is_playing):
     emit('playing-set', room.is_playing, room=room_id, include_self=True)
 
 
-@socketio.on('change-seek-time')
+@socketio.on('seek-time')
 def on_change_playback_time(room_id, new_time):
     room: Room = Room.objects.get_or_404(pk=room_id)
 
     room.last_seeked_time = new_time
     room.save()
 
-    emit('seek-time-changed', new_time, room=room_id, include_self=True)
+    emit('time-seeked', new_time, room=room_id, include_self=True)
 
 
 @socketio.on('play-song')

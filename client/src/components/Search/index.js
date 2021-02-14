@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { SERVER_URL } from '../../util/api.js';
-import { MdQueueMusic } from 'react-icons/md';
+import { QueueMusic } from '@material-ui/icons';
 
 import RoomContext from '../../pages/Room/context.js';
 import SongCard from '../SongCard';
@@ -68,7 +68,7 @@ class Search extends Component {
                     songs.map(song => (
                         <SongCard key={song.api_id} song={song} buttons={
                             <button onClick={() => emitData('queue-song', song.api_id)} className='button'>
-                                <MdQueueMusic className='icon' size={30} />
+                                <QueueMusic className='icon' size={30} />
                             </button>
                         } />
                     ))

@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { MdSkipNext, MdDelete } from 'react-icons/md';
+import { SkipNext, Delete } from '@material-ui/icons';
 
 import RoomContext from '../../pages/Room/context.js';
 import './style.css';
 
-// so we can get the context through props in componentDidUpdate
+// for this component we get the context through props so we can use componentDidUpdate
 const withContext = Wrapped => props => (
     <RoomContext.Consumer>
         {value => <Wrapped {...props} context={value} />}
@@ -37,11 +37,11 @@ const Player = withContext(class extends Component {
 
     componentDidUpdate(prevProps) {
         const prevContext = prevProps.context;
-        const { emitData, needPlaybackStateFor, playbackStateResponded,
+        const { emitData, sidAwaitingState, playbackStateResponded,
             queue, isPlaying, lastSeekedTime } = this.props.context;
 
-        if (needPlaybackStateFor !== prevContext.needPlaybackStateFor) {
-            emitData('playback-state-response', needPlaybackStateFor, !this.audio.paused, this.audio.currentTime)
+        if (sidAwaitingState !== prevContext.sidAwaitingState) {
+            emitData('playback-state-response', sidAwaitingState, !this.audio.paused, this.audio.currentTime)
             playbackStateResponded()
         }
 
@@ -74,9 +74,9 @@ const Player = withContext(class extends Component {
                     <p className='notice'>No song playing</p>
                     : <>
                         <button className='button skip-button' onClick={this.playNextSong}>
-                            {!queue.length > 1 ?
-                                <MdSkipNext className='icon' size={20} />
-                                : <MdDelete className='icon' size={20} />
+                            {queue.length > 1 ?
+                                <SkipNext className='icon' size={20} />
+                                : <Delete className='icon' size={20} />
                             }
                         </button>
                         <h2><i>{song.title}</i></h2>
@@ -90,7 +90,7 @@ const Player = withContext(class extends Component {
                 <audio id='audio' controls ref={ref => this.audio = ref}
                     onPlay={() => emitData('set-playing', true)}
                     onPause={() => emitData('set-playing', false)}
-                    onSeeked={() => emitData('change-seek-time', this.audio.currentTime)}
+                    onSeeked={() => emitData('seek-time', this.audio.currentTime)}
                     onEnded={() => {
                         if (isSourceOfTruth)
                             this.playNextSong()

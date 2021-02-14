@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { io } from "socket.io-client";
-import { Container, Row, Col } from 'react-grid-system';
+import { Grid } from '@material-ui/core';
 import { withRouter } from 'react-router-dom';
 
 import RoomContext from './context.js';
@@ -24,7 +24,7 @@ class Room extends Component {
             lastSeekedTime: 0,
             isPlaying: false,
             playbackStateResponded: this.playbackStateResponded,
-            needPlaybackStateFor: null,
+            sidAwaitingState: null,
         }
 
         this.state = {
@@ -45,6 +45,7 @@ class Room extends Component {
             this.setState({ loadingMessage: 'Joining room...' })
             this.emitData('join')
         });
+
         socket.on('get-room-state', (roomState) => {
             this.setState({
                 loadingMessage: '',
@@ -54,31 +55,39 @@ class Room extends Component {
                 isPlaying: roomState.is_playing
             })
         })
-        socket.on('playback-state-request', (forSID) => {
+
+        socket.on('playback-state-request', (sidAwaitingState) => {
             if (this.state.isSourceOfTruth)
-                this.setState({ needPlaybackStateFor: forSID });
+                this.setState({ sidAwaitingState });
         })
+
         socket.on('disconnect', () => {
             this.disconnectSocket()
         })
+
         socket.on('notify-as-source-of-truth', () => {
             this.setState({ isSourceOfTruth: true });
         })
+
         socket.on('playing-set', (isPlaying) => {
             this.setState({ isPlaying });
         })
-        socket.on('seek-time-changed', (newTime) => {
-            this.setState({ lastSeekedTime: newTime });
+
+        socket.on('time-seeked', (seekedTime) => {
+            this.setState({ lastSeekedTime: seekedTime });
         })
+
         socket.on('song-played', (atIndex) => {
             const { queue } = this.state;
             this.setState({ queue: queue.slice(atIndex) });
         })
+
         socket.on('song-queued', (song) => {
             const { queue } = this.state;
             queue.push(song);
             this.setState({ queue });
         })
+
         socket.on('song-removed', (atIndex) => {
             const { queue } = this.state;
             queue.splice(atIndex, 1);
@@ -102,14 +111,13 @@ class Room extends Component {
         return value;
     }
 
-
     emitData = (endpoint, ...args) => {
         if (this.socket)
             this.socket.emit(endpoint, this.roomID, ...args);
     }
 
     playbackStateResponded = () => {
-        this.setState({ needPlaybackStateFor: null });
+        this.setState({ sidAwaitingState: null });
     }
 
     disconnectSocket = () => {
@@ -134,25 +142,25 @@ class Room extends Component {
                 :
                 <RoomContext.Provider value={this.getContextValue()}>
 
-                    <Container>
-                        <Row>
-                            <Col lg={4}>
-                                <div className='section'>
-                                    <Search />
-                                </div>
-                            </Col>
-                            <Col lg={4}>
-                                <div className='section'>
-                                    <Player />
-                                </div>
-                            </Col>
-                            <Col lg={4}>
-                                <div className='section'>
-                                    <Queue />
-                                </div>
-                            </Col>
-                        </Row>
-                    </Container>
+                    <Grid container direction="row"
+                        justify="center"
+                        alignItems="center">
+                        <Grid item md={4} xs={12}>
+                            <div className='section'>
+                                <Search />
+                            </div>
+                        </Grid>
+                        <Grid item md={4} xs={12}>
+                            <div className='section'>
+                                <Player />
+                            </div>
+                        </Grid>
+                        <Grid item md={4} xs={12}>
+                            <div className='section'>
+                                <Queue />
+                            </div>
+                        </Grid>
+                    </Grid>
 
                 </RoomContext.Provider>
             }
