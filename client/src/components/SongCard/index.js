@@ -5,7 +5,7 @@ import './style.css';
 
 function SongCard(props) {
 
-    const limitLength = (field) => field.length > 30 ? field.substring(0, 20) + "..." : field;
+    const limitLength = (field) => field.length > 30 ? field.substring(0, 30) + "..." : field;
 
     const { song, buttons } = props;
 
@@ -14,7 +14,7 @@ function SongCard(props) {
             <img src={song.cover_small} alt="" />
             <div>
                 <h5>{song.title}</h5>
-                <p>{limitLength(song.title)}</p>
+                <p>{limitLength(song.album)}</p>
                 <p>{song.artist}</p>
             </div>
         </div>

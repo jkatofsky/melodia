@@ -143,8 +143,7 @@ class Room extends Component {
                 <RoomContext.Provider value={this.getContextValue()}>
 
                     <Grid container direction="row"
-                        justify="center"
-                        alignItems="center">
+                        justify="center" alignItems="flex-start">
                         <Grid item md={4} xs={12}>
                             <div className='section'>
                                 <Search />
