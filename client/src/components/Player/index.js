@@ -73,7 +73,7 @@ const Player = withContext(class extends Component {
                 {!song ?
                     <p className='notice'>No song playing</p>
                     : <>
-                        <button className='button skip-button' onClick={this.playNextSong}>
+                        <button className='icon-button skip-button' onClick={this.playNextSong}>
                             {queue.length > 1 ?
                                 <SkipNext className='icon' size={20} />
                                 : <Delete className='icon' size={20} />

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { SERVER_URL } from '../../util/api.js';
+import { apiCall } from '../../util/api.js';
 import { QueueMusic } from '@material-ui/icons';
 
 import RoomContext from '../../pages/Room/context.js';
@@ -22,18 +22,12 @@ class Search extends Component {
 
     searchSongs = async (query) => {
         this.setState({ loading: true });
-        const response = await fetch(`${SERVER_URL}/api/search/${query}`,
-            {
-                mode: 'cors',
-                headers: { 'Access-Control-Allow-Origin': '*' }
-            });
-
+        const songsResponse = await apiCall(`search/${query}`);
         let songs;
-        if (response.status !== 200) {
+        if (!songsResponse) {
             songs = [];
         } else {
-            const responseJSON = await response.json();
-            songs = responseJSON['results'];
+            songs = songsResponse['results'];
         }
         this.setState({
             loading: false,
@@ -67,7 +61,7 @@ class Search extends Component {
                 {!loading ?
                     songs.map(song => (
                         <SongCard key={song.api_id} song={song} buttons={
-                            <button onClick={() => emitData('queue-song', song.api_id)} className='button'>
+                            <button onClick={() => emitData('queue-song', song.api_id)} className='icon-button'>
                                 <QueueMusic className='icon' size={30} />
                             </button>
                         } />

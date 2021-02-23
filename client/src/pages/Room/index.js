@@ -7,7 +7,6 @@ import RoomContext from './context.js';
 import Search from '../../components/Search'
 import Player from '../../components/Player';
 import Queue from '../../components/Queue';
-import Header from '../../components/Header';
 import { SERVER_URL } from '../../util/api.js';
 import './style.css';
 
@@ -130,8 +129,6 @@ class Room extends Component {
         const { loading, loadingMessage } = this.state;
 
         return <>
-            <Header />
-
             {/* TODO: need some solution to stop complaning about auto-playing music 
             before the users interacts w/ html */}
 

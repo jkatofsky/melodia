@@ -6,20 +6,25 @@ import {
 } from "react-router-dom";
 
 
+import Header from './components/Header';
 import Landing from './pages/Landing';
 import Room from './pages/Room';
 
+
 const App = () => {
-    return <Router>
-        <Switch>
-            <Route exact path="/">
-                <Landing />
-            </Route>
-            <Route path="/room/:id">
-                <Room />
-            </Route>
-        </Switch>
-    </Router>
+    return <>
+        <Header />
+        <Router>
+            <Switch>
+                <Route exact path="/">
+                    <Landing />
+                </Route>
+                <Route path="/room/:id">
+                    <Room />
+                </Route>
+            </Switch>
+        </Router>
+    </>
 }
 
 export default App;

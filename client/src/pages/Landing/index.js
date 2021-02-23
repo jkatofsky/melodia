@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { SERVER_URL } from '../../util/api.js';
+import { apiCall } from '../../util/api.js';
 import { Link, Redirect } from 'react-router-dom';
 
 import './style.css';
@@ -23,9 +23,9 @@ class Landing extends Component {
 
     createRoom = async () => {
         this.setState({ creatingRoom: true });
-        const response = await fetch(`${SERVER_URL}/api/create-room`);
-        const data = await response.json();
-        this.setState({ createdRoomID: data['room_id'] });
+        // TODO: what if no response?
+        const createResponse = await apiCall(`create-room`);
+        this.setState({ createdRoomID: createResponse['room_id'] });
     }
 
 
@@ -37,7 +37,6 @@ class Landing extends Component {
             {createdRoomID &&
                 <Redirect to={`/room/${createdRoomID}`} />
             }
-            <h1 className='landing-title'>Melodia</h1>
             <button className="btn1" onClick={this.createRoom}>Create Room</button>
             <br />
             <input type="text" placeholder="Enter Room ID"
