@@ -61,7 +61,7 @@ class Search extends Component {
                     songs.map(song => (
                         <SongCard key={song.api_id} song={song} buttons={
                             <button onClick={() => emitData('queue-song', song.api_id)} className='button'>
-                                <QueueMusic className='icon' size={30} />
+                                <QueueMusic />
                             </button>
                         } />
                     ))

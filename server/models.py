@@ -1,4 +1,4 @@
-from .app import db # TODO: from mongoengine import *, then remove all the "db."s ?
+from .app import db
 import requests
 import json
 

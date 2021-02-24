@@ -24,7 +24,6 @@ class Landing extends Component {
 
     createRoom = async () => {
         this.setState({ creatingRoom: true });
-        // TODO: what if no response?
         const createResponse = await apiCall(`create-room`);
         this.setState({ createdRoomID: createResponse['room_id'] });
     }

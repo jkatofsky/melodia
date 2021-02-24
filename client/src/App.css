@@ -8,9 +8,6 @@ input {
 
 .button {
     font-family: 'Quicksand', sans-serif;
-    font-weight: bold;
-    font-style: italic;
-    font-size: 2em;
     border-width: 0;
     padding: 6px 12px 6px 12px;
     border-radius: 15px;
@@ -23,9 +20,3 @@ input {
     cursor: pointer;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
 }
-
-
-/* .icon {
-    vertical-align: middle;
-    margin: 0 0.2em;
-} */

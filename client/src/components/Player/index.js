@@ -87,8 +87,8 @@ class Player extends Component {
                     : <>
                         <button className='button skip-button' onClick={this.playNextSong}>
                             {queue.length > 1 ?
-                                <SkipNext className='icon' size={20} />
-                                : <Delete className='icon' size={20} />
+                                <SkipNext />
+                                : <Delete />
                             }
                         </button>
                         <h2><i>{song.title}</i></h2>

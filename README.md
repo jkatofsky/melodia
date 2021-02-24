@@ -20,9 +20,6 @@ For sure:
 - [ ] more informative loading state on client & request validation on server
 - [ ] continue adopting Material UI
 - [ ] add clear search button
-- [ ] fix homepage button spacing
-- [ ] 'copy link to clipboard' and 'copy id to clipboard' buttons on room page
-- [ ] 'go to homepage' button on room
 
 Possible bells and whistles:
 

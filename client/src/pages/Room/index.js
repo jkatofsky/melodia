@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { io } from "socket.io-client";
 import { Grid } from '@material-ui/core';
-import { withRouter } from 'react-router-dom';
+import HomeIcon from '@material-ui/icons/Home';
+import FileCopyIcon from '@material-ui/icons/FileCopy';
+import { Link, withRouter } from 'react-router-dom';
 
 import RoomContext from './context.js';
 import Search from '../../components/Search'
@@ -130,10 +132,21 @@ class Room extends Component {
         const { loading, loadingMessage } = this.state;
 
         return <>
+
+            <Link to='/'>
+                <button className="button home-button"><HomeIcon /></button>
+            </Link>
+
             {loading ?
                 <h2>{loadingMessage}</h2>
                 :
                 <RoomContext.Provider value={this.getContextValue()}>
+
+                    <button className='button clipboard-button'
+                        onClick={() => { navigator.clipboard.writeText(this.roomID) }}>
+                        <FileCopyIcon />&nbsp;
+                        Room ID
+                    </button>
 
                     <Grid container direction="row"
                         justify="center" alignItems="flex-start">

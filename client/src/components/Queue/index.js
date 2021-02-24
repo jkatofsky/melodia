@@ -23,10 +23,10 @@ class Queue extends Component {
                         <SongCard key={index} song={song} buttons={
                             <>
                                 <button onClick={() => emitData('play-song', index + 1)} className='button'>
-                                    <PlayArrow className='icon' size={15} />
+                                    <PlayArrow />
                                 </button>
                                 <button onClick={() => emitData('remove-song', index + 1)} className='button'>
-                                    <Delete className='icon' size={15} />
+                                    <Delete />
                                 </button>
                             </>
                         } />)
