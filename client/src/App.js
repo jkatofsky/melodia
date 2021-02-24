@@ -10,6 +10,8 @@ import Header from './components/Header';
 import Landing from './pages/Landing';
 import Room from './pages/Room';
 
+import './App.css';
+
 
 const App = () => {
     return <>

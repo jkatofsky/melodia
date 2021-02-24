@@ -15,7 +15,7 @@ def on_toggle_play(room_id, is_playing):
 
 
 @socketio.on('seek')
-def on_change_playback_time(room_id, new_time):
+def on_change_last_synced_playback_time(room_id, new_time):
     emit('seeked', new_time, room=room_id, include_self=False)
 
     room: Room = Room.objects.get_or_404(pk=room_id)

@@ -55,7 +55,7 @@ def on_playback_state_response(room_id, sid_awaiting_state, is_playing, playback
     room: Room = Room.objects.get_or_404(pk=room_id)
 
     room.is_playing = is_playing
-    room.last_seeked_time = playback_time
+    room.last_synced_playback_time = playback_time
     room.save()
     
     emit('get-room-state', room_state_dict(room), to=sid_awaiting_state)

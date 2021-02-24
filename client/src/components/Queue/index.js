@@ -22,10 +22,10 @@ class Queue extends Component {
                     songs.map((song, index) =>
                         <SongCard key={index} song={song} buttons={
                             <>
-                                <button onClick={() => emitData('play-song', index + 1)} className='icon-button'>
+                                <button onClick={() => emitData('play-song', index + 1)} className='button'>
                                     <PlayArrow className='icon' size={15} />
                                 </button>
-                                <button onClick={() => emitData('remove-song', index + 1)} className='icon-button'>
+                                <button onClick={() => emitData('remove-song', index + 1)} className='button'>
                                     <Delete className='icon' size={15} />
                                 </button>
                             </>

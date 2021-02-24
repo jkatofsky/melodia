@@ -2,6 +2,11 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop&family=Pacifico&display=swap');
 
+html {
+    min-height: 100%;
+    background: linear-gradient(rgb(183, 63, 238), rgb(240, 168, 236));
+}
+
 body {
     margin: 0;
 
@@ -9,7 +14,4 @@ body {
 
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-
-    background: linear-gradient(rgb(183, 63, 238), rgb(240, 168, 236));
-    height: 100vh;
 }

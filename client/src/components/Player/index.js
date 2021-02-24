@@ -22,20 +22,22 @@ class Player extends Component {
     }
 
     componentDidMount() {
-        const { queue, lastSeekedTime } = this.props.context;
+        const { queue, lastSyncedPlaybackTime, isPlaying } = this.props.context;
         const song = this.song(queue);
 
         if (song) {
+            this.setState({ externalPlaystateEvent: true })
             this.audioSource.src = song.source;
             this.audio.load();
-            if (lastSeekedTime) this.audio.currentTime = lastSeekedTime;
+            if (lastSyncedPlaybackTime) this.audio.currentTime = lastSyncedPlaybackTime;
+            if (isPlaying) this.audio.play();
         }
     }
 
     componentDidUpdate(prevProps) {
         const prevContext = prevProps.context;
         const { emitData, sidAwaitingState, playbackStateResponded,
-            queue, isPlaying, lastSeekedTime } = this.props.context;
+            queue, isPlaying, lastSyncedPlaybackTime } = this.props.context;
 
         if (sidAwaitingState && sidAwaitingState !== prevContext.sidAwaitingState) {
             emitData('playback-state-response', sidAwaitingState, !this.audio.paused, this.audio.currentTime)
@@ -58,9 +60,10 @@ class Player extends Component {
             if (isPlaying) this.audio.play();
             else this.audio.pause()
         }
-        if (lastSeekedTime && prevContext.lastSeekedTime !== lastSeekedTime) {
+
+        if (lastSyncedPlaybackTime && prevContext.lastSyncedPlaybackTime !== lastSyncedPlaybackTime) {
             this.setState({ externalPlaystateEvent: true })
-            this.audio.currentTime = lastSeekedTime;
+            this.audio.currentTime = lastSyncedPlaybackTime;
         }
     }
 
@@ -82,7 +85,7 @@ class Player extends Component {
                 {!song ?
                     <p className='notice'>No song playing</p>
                     : <>
-                        <button className='icon-button skip-button' onClick={this.playNextSong}>
+                        <button className='button skip-button' onClick={this.playNextSong}>
                             {queue.length > 1 ?
                                 <SkipNext className='icon' size={20} />
                                 : <Delete className='icon' size={20} />

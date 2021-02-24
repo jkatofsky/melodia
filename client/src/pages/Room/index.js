@@ -20,7 +20,7 @@ class Room extends Component {
             emitData: this.emitData,
             isSourceOfTruth: false,
             queue: [],
-            lastSeekedTime: 0,
+            lastSyncedPlaybackTime: 0,
             isPlaying: false,
             playbackStateResponded: this.playbackStateResponded,
             sidAwaitingState: null,
@@ -34,7 +34,7 @@ class Room extends Component {
     }
 
     //all handlers happen here
-    //all emits (other than join/leave) happen in components
+    //all emits (other than join/leave) happen in child components
 
     componentDidMount() {
         const socket = io(SERVER_URL, { transports: ['websocket'] });
@@ -50,7 +50,7 @@ class Room extends Component {
                 loadingMessage: '',
                 loading: false,
                 queue: roomState.queue,
-                lastSeekedTime: roomState.last_seeked_time,
+                lastSyncedPlaybackTime: roomState.last_synced_playback_time,
                 isPlaying: roomState.is_playing
             })
         })
@@ -73,7 +73,7 @@ class Room extends Component {
         })
 
         socket.on('seeked', (seekedTime) => {
-            this.setState({ lastSeekedTime: seekedTime });
+            this.setState({ lastSyncedPlaybackTime: seekedTime });
         })
 
         socket.on('song-played', (atIndex) => {
@@ -130,11 +130,6 @@ class Room extends Component {
         const { loading, loadingMessage } = this.state;
 
         return <>
-            {/* TODO: need some solution to stop complaning about auto-playing music 
-            before the users interacts w/ html */}
-
-            {/* TODO: need a render fallback (and server stuff) for invalid room state */}
-
             {loading ?
                 <h2>{loadingMessage}</h2>
                 :

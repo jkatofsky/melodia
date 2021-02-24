@@ -4,7 +4,6 @@ import { QueueMusic } from '@material-ui/icons';
 
 import RoomContext from '../../pages/Room/context.js';
 import SongCard from '../SongCard';
-import './style.css';
 
 class Search extends Component {
 
@@ -61,7 +60,7 @@ class Search extends Component {
                 {!loading ?
                     songs.map(song => (
                         <SongCard key={song.api_id} song={song} buttons={
-                            <button onClick={() => emitData('queue-song', song.api_id)} className='icon-button'>
+                            <button onClick={() => emitData('queue-song', song.api_id)} className='button'>
                                 <QueueMusic className='icon' size={30} />
                             </button>
                         } />
