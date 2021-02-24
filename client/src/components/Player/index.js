@@ -26,45 +26,55 @@ class Player extends Component {
         const song = this.song(queue);
 
         if (song) {
-            this.setState({ externalPlaystateEvent: true })
-            this.audioSource.src = song.source;
-            this.audio.load();
-            if (lastSyncedPlaybackTime) this.audio.currentTime = lastSyncedPlaybackTime;
-            if (isPlaying) this.audio.play();
+            this.onExternalSetSource(song.source);
+            if (lastSyncedPlaybackTime) this.onExternalSeek(lastSyncedPlaybackTime);
+            if (isPlaying) this.onExternalSetIsPlaying(true);
         }
     }
 
     componentDidUpdate(prevProps) {
         const prevContext = prevProps.context;
-        const { emitData, sidAwaitingState, playbackStateResponded,
+        const { emitData, sidAwaitingState, onPlaybackStateResponded,
             queue, isPlaying, lastSyncedPlaybackTime } = this.props.context;
 
         if (sidAwaitingState && sidAwaitingState !== prevContext.sidAwaitingState) {
             emitData('playback-state-response', sidAwaitingState, !this.audio.paused, this.audio.currentTime)
-            playbackStateResponded()
+            onPlaybackStateResponded()
         }
 
         const prevSong = this.song(prevContext.queue);
         const song = this.song(queue);
 
         if (!song) {
-            this.audioSource.src = "";
-            this.audio.load();
+            this.onExternalSetSource("");
         } else if ((!prevSong) || (prevSong.api_id !== song.api_id)) {
-            this.audioSource.src = song.source;
-            this.audio.load();
+            this.onExternalSetSource(song.source);
         }
 
         if (prevContext.isPlaying !== isPlaying) {
-            this.setState({ externalPlaystateEvent: true })
-            if (isPlaying) this.audio.play();
-            else this.audio.pause()
+            this.onExternalSetIsPlaying(isPlaying);
         }
 
         if (lastSyncedPlaybackTime && prevContext.lastSyncedPlaybackTime !== lastSyncedPlaybackTime) {
-            this.setState({ externalPlaystateEvent: true })
-            this.audio.currentTime = lastSyncedPlaybackTime;
+            this.onExternalSeek(lastSyncedPlaybackTime);
         }
+
+    }
+
+    onExternalSetSource = (source) => {
+        this.audioSource.src = source;
+        this.audio.load();
+    }
+
+    onExternalSeek = (time) => {
+        this.setState({ externalPlaystateEvent: true })
+        this.audio.currentTime = time;
+    }
+
+    onExternalSetIsPlaying = (isPlaying) => {
+        this.setState({ externalPlaystateEvent: true });
+        if (isPlaying) this.audio.play();
+        else this.audio.pause()
     }
 
     //so onPlay/onSeek won't emit when client recieves programmatic updates in componentDidUpdate
@@ -72,7 +82,7 @@ class Player extends Component {
         const { externalPlaystateEvent } = this.state;
         const { emitData } = this.props.context;
         if (!externalPlaystateEvent) emitData(...args);
-        if (externalPlaystateEvent) this.setState({ externalPlaystateEvent: false });
+        else this.setState({ externalPlaystateEvent: false })
     }
 
     render() {
@@ -99,9 +109,15 @@ class Player extends Component {
             </div>
             <div className='song-player'>
                 <audio id='audio' controls ref={ref => this.audio = ref}
-                    onPlay={() => this.emitOnlyHumanEvents('set-playing', true)}
-                    onPause={() => this.emitOnlyHumanEvents('set-playing', false)}
-                    onSeeked={() => this.emitOnlyHumanEvents('seek', this.audio.currentTime)}
+                    onPlay={() => {
+                        this.emitOnlyHumanEvents('set-playing', true);
+                    }}
+                    onPause={() => {
+                        this.emitOnlyHumanEvents('set-playing', false);
+                    }}
+                    onSeeked={() => {
+                        this.emitOnlyHumanEvents('seek', this.audio.currentTime)
+                    }}
                     onEnded={() => {
                         if (isSourceOfTruth)
                             this.playNextSong()

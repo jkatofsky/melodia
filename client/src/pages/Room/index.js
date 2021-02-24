@@ -24,7 +24,7 @@ class Room extends Component {
             queue: [],
             lastSyncedPlaybackTime: 0,
             isPlaying: false,
-            playbackStateResponded: this.playbackStateResponded,
+            onPlaybackStateResponded: this.onPlaybackStateResponded,
             sidAwaitingState: null,
         }
 
@@ -118,7 +118,7 @@ class Room extends Component {
             this.socket.emit(endpoint, this.roomID, ...args);
     }
 
-    playbackStateResponded = () => {
+    onPlaybackStateResponded = () => {
         this.setState({ sidAwaitingState: null });
     }
 
