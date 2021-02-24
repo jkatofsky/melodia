@@ -12,19 +12,15 @@ def on_join(room_id):
 
     if not room.source_of_truth_sid:
         room.source_of_truth_sid = request.sid
-        emit('notify-as-source-of-truth', room=request.sid)
-        emit('get-room-state', room_state_dict(room), room=request.sid)
+        emit('notify-as-source-of-truth', to=request.sid)
+        emit('get-room-state', room_state_dict(room), to=request.sid)
     else:
         room.other_client_sids.append(request.sid)
-        emit('playback-state-request', request.sid, room=room.source_of_truth_sid)
-
-    # TODO: remove when done testing
-    print('joined sid', request.sid)
-    print('joined sot', room.source_of_truth_sid)
-    print('joined others', room.other_client_sids)
+        emit('playback-state-request', request.sid, to=room.source_of_truth_sid)
 
     join_room(room_id)
     room.save()
+
 
 def on_leave_or_disconnect(room_id, sid):
     room: Room = Room.objects.get_or_404(pk=room_id)
@@ -35,14 +31,9 @@ def on_leave_or_disconnect(room_id, sid):
             room.is_playing = False
         else:
             room.source_of_truth_sid = room.other_client_sids.pop(0)
-            socketio.emit('notify-as-source-of-truth', room=room.source_of_truth_sid)
+            socketio.emit('notify-as-source-of-truth', to=room.source_of_truth_sid)
     else:
         room.other_client_sids.remove(sid)
-
-    # TODO: remove when done testing
-    print('leave sid', request.sid)
-    print('leave sot', room.source_of_truth_sid)
-    print('leave others', room.other_client_sids)
 
     room.save()
 
@@ -67,4 +58,4 @@ def on_playback_state_response(room_id, sid_awaiting_state, is_playing, playback
     room.last_seeked_time = playback_time
     room.save()
     
-    emit('get-room-state', room_state_dict(room), room=sid_awaiting_state, include_self=True)
+    emit('get-room-state', room_state_dict(room), to=sid_awaiting_state)

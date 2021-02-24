@@ -72,7 +72,7 @@ class Room extends Component {
             this.setState({ isPlaying });
         })
 
-        socket.on('time-seeked', (seekedTime) => {
+        socket.on('seeked', (seekedTime) => {
             this.setState({ lastSeekedTime: seekedTime });
         })
 
@@ -83,8 +83,9 @@ class Room extends Component {
 
         socket.on('song-queued', (song) => {
             const { queue } = this.state;
-            queue.push(song);
-            this.setState({ queue });
+            const _queue = [...queue];
+            _queue.push(song);
+            this.setState({ queue: _queue });
         })
 
         socket.on('song-removed', (atIndex) => {

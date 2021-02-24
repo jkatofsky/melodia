@@ -1,4 +1,4 @@
-from .app import db
+from .app import db # TODO: from mongoengine import *, then remove all the "db."s ?
 import requests
 import json
 
@@ -21,7 +21,7 @@ def get_search_results(query):
     return [api_song_to_schema(api_song, search_result=True) for api_song in response['data']]
 
 
-class Song(db.Document):
+class Song(db.EmbeddedDocument):
     api_id = db.StringField()
     title = db.StringField()
     artist = db.StringField()
@@ -31,15 +31,14 @@ class Song(db.Document):
     cover_big = db.URLField()
 
 
-def save_song_to_db(song_api_id):
+def get_song_document(song_api_id):
     api_song = requests.get(f'{API_URL}/track/{song_api_id}').json()
     song = Song(**api_song_to_schema(api_song))
-    song.save()
     return song
 
 
 class Room(db.Document):
-    queue = db.ListField(db.ReferenceField(Song), default=list)
+    queue = db.EmbeddedDocumentListField(Song, default=list)
     source_of_truth_sid = db.StringField()
     other_client_sids = db.ListField(db.StringField(), default=list)
     is_playing = db.BooleanField(default=False)

@@ -16,9 +16,9 @@ Built with:
 
 For sure:
 
-- [ ] finish the implementation of my more ambitious syncing system
+- [ ] check if Room rendered as a redirect from Landing; if not, require interaction with HTML before rendering room so song can autoplay
 - [ ] more informative loading state on client & request validation on server
-- [ ] use material UI!
+- [ ] continue adopting Material UI
 - [ ] add clear search button
 - [ ] fix homepage button spacing
 - [ ] 'copy link to clipboard' and 'copy id to clipboard' buttons on room page
