@@ -6,7 +6,7 @@ from flask_socketio import emit
 
 
 @socketio.on('set-playing')
-def on_toggle_play(room_id, is_playing):
+def on_set_playing(room_id, is_playing):
     emit('playing-set', is_playing, room=room_id, include_self=False)
 
     room: Room = Room.objects.get_or_404(pk=room_id)
@@ -15,7 +15,7 @@ def on_toggle_play(room_id, is_playing):
 
 
 @socketio.on('seek')
-def on_change_last_synced_playback_time(room_id, new_time):
+def on_seek(room_id, new_time):
     emit('seeked', new_time, room=room_id, include_self=False)
 
     room: Room = Room.objects.get_or_404(pk=room_id)
@@ -24,7 +24,7 @@ def on_change_last_synced_playback_time(room_id, new_time):
 
 
 @socketio.on('play-song')
-def play_song(room_id, at_index):
+def on_play_song(room_id, at_index):
     emit('song-played', at_index, room=room_id, include_self=True)
 
     room: Room = Room.objects.get_or_404(pk=room_id)
@@ -33,7 +33,7 @@ def play_song(room_id, at_index):
 
 
 @socketio.on('queue-song')
-def queue_song(room_id, song_api_id):
+def on_queue_song(room_id, song_api_id):
     song = get_song_document(song_api_id)
     emit('song-queued', json.loads(song.to_json()), room=room_id, include_self=True)
 
@@ -43,7 +43,7 @@ def queue_song(room_id, song_api_id):
 
 
 @socketio.on('remove-song')
-def remove_song(room_id, at_index):
+def on_remove_song(room_id, at_index):
     emit('song-removed', at_index, room=room_id, include_self=True)
 
     room: Room = Room.objects.get_or_404(pk=room_id)

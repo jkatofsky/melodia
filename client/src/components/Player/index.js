@@ -108,7 +108,7 @@ class Player extends Component {
                 }
             </div>
             <div className='song-player'>
-                <audio id='audio' controls ref={ref => this.audio = ref}
+                <audio controls ref={ref => this.audio = ref}
                     onPlay={() => {
                         this.emitOnlyHumanEvents('set-playing', true);
                     }}
@@ -122,7 +122,7 @@ class Player extends Component {
                         if (isSourceOfTruth)
                             this.playNextSong()
                     }}>
-                    <source id='audio-source' src="" type='audio/mp3' ref={ref => this.audioSource = ref} />
+                    <source src="" type='audio/mp3' ref={ref => this.audioSource = ref} />
                 </audio>
             </div>
         </>;
